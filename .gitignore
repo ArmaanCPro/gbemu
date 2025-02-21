@@ -1,0 +1,13 @@
+.idea/
+.vs/
+.vscode/
+
+build/
+
+*.log
+
+CMakeUserPresets.json
+**.user
+**.user.*
+**.env
+**.env.*
