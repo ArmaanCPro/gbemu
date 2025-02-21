@@ -1,8 +1,8 @@
-#include <iostream>
+#pragma once
 
-namespace core 
+namespace core
 {
-    int test_return5()
+    inline int debug_return5()
     {
         return 5;
     }

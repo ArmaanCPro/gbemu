@@ -4,7 +4,7 @@
 
 int main()
 {
-    int x = core::test_return5();
+    const int x = core::test_return5();
     std::cout << x << std::endl;
     return 0;
 }
