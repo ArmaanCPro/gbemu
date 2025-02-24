@@ -101,4 +101,10 @@ struct core::cpu
 
     // returns the # of cycles
     uint32_t execute(ram& mem);
+
+    inline void bootup(ram &mem)
+    {
+        // boot up sequence here with startup ROM
+        mem.memory.fill(0);
+    }
 };
