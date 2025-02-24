@@ -1,10 +1,11 @@
-#include "core.h"
-
 #include <iostream>
+
+#include "core.h"
 
 int main()
 {
-    const int x = core::test_return5();
-    std::cout << x << std::endl;
+    core::ram mem;
+    core::cpu cpu;
+    cpu.execute(mem);
     return 0;
 }

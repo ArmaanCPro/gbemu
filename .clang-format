@@ -12,6 +12,7 @@ BraceWrapping:
   AfterUnion: true
   AfterExternBlock: true
   BeforeElse: true
-  IndentBraces: false
+  IndentBraces: true
 IndentWidth: 4
 NamespaceIndentation: All
+IndentCaseBlocks: false
