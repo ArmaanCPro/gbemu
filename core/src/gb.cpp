@@ -17,17 +17,19 @@ uint32_t gb::cpu::execute(work_ram& mem)
 uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
 {
     uint32_t cycles = 0;
+    // consider adding instruction table instead of switch statement
     switch (opcode)
     {
-    case NOP:
-        break;
-    case LD_BC_NN:
-    {
-        BC.low = read_byte(mem, cycles);
-        BC.high = read_byte(mem, cycles);
-    } break;
-    default:
-        std::cerr << "Unknown opcode: " << std::hex << (opcode) << std::endl;
+        case NOP:
+            break;
+        case LD_BC_NN:
+        {
+            BC.low = read_byte(mem, cycles);
+            BC.high = read_byte(mem, cycles);
+        } break;
+
+        default:
+            std::cerr << "Unknown opcode: " << std::hex << (opcode) << std::endl;
     }
 
     // bullshit for the compiler

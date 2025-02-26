@@ -15,4 +15,5 @@ BraceWrapping:
   IndentBraces: true
 IndentWidth: 4
 NamespaceIndentation: All
-IndentCaseBlocks: false
+IndentCaseBlocks: true
+IndentCaseLabels: true
