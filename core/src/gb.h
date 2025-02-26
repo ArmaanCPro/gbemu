@@ -62,6 +62,7 @@ struct gb::cpu
         JP_Z_NN     = 0xCA,
         JR_N        = 0x18,
         // Load Instructions
+        LD_BC_NN    = 0x01,
         LD_B_N      = 0x06,
         LD_D_N      = 0x16,
         LD_H_N      = 0x26,
@@ -106,8 +107,7 @@ struct gb::cpu
         EI          = 0xFB
     ;
 
-    // Add methods to access HRAM
-    inline uint8_t read_hram(uint16_t address) const
+    [[nodiscard]] inline uint8_t read_hram(uint16_t address)
     {
         if (address >= 0xFF80 && address <= 0xFFFE)
         {
@@ -126,24 +126,22 @@ struct gb::cpu
         throw std::out_of_range("HRAM access out of range");
     }
 
-    // Example read_byte function (updated to handle HRAM)
-    inline uint8_t read_byte(work_ram& mem, uint16_t address, uint32_t& cycles) const
+    [[nodiscard]] inline uint8_t read_byte(work_ram& mem, uint32_t& cycles)
     {
         cycles++;
-        if (address >= 0xFF80 && address <= 0xFFFE)
+        if (PC >= 0xFF80 && PC <= 0xFFFE)
         {
             // Handle HRAM access
-            return read_hram(address);
+            return read_hram(PC++);
         }
-        else if (address < mem.data.size())
+        else if (PC < mem.data.size())
         {
             // Handle WRAM access
-            return mem.data[address];
+            return mem.data[PC++];
         }
         throw std::out_of_range("Invalid memory read");
     }
 
-    // Example write_byte function (updated to handle HRAM)
     inline void write_byte(work_ram& mem, uint16_t address, uint8_t value, uint32_t& cycles)
     {
         cycles++;
@@ -172,23 +170,5 @@ struct gb::cpu
     void load_rom(const std::string& rom_path, work_ram& mem);
 
 
-    inline void power_up_sequence(work_ram& wram)
-    {
-        // init cpu registers
-        SP = 0xFFFE;
-        PC = 0x0000; // Start with Boot ROM
-        AF.full = 0x01B0;
-        BC.full = 0x0013;
-        DE.full = 0x00D8;
-        HL.full = 0x014D;
-
-        // init memory
-        wram.data.fill(0);
-        high_ram.fill(0);
-
-        for (int i = 0; i < DMG_BOOT_ROM_SIZE; i++)
-        {
-            wram.data[i] = dmg_boot[i];
-        }
-    }
+    void power_up_sequence(work_ram& wram);
 };
