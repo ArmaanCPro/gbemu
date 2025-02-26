@@ -1,11 +1,16 @@
 #include <iostream>
 
-#include "core.h"
+#include "gb.h"
 
 int main()
 {
-    core::ram mem;
-    core::cpu cpu;
-    cpu.execute(mem);
+    gb::work_ram mem;
+    gb::cpu cpu {mem};
+
+    uint32_t cycles = mem.data.size();
+    while (cycles != 0)
+    {
+        cycles -= cpu.execute(mem);
+    }
     return 0;
 }

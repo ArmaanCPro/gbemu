@@ -1,0 +1,44 @@
+#include "gb.h"
+
+#include <iostream>
+#include <filesystem>
+
+uint32_t gb::cpu::execute(work_ram& mem)
+{
+    uint32_t cycles = 0;
+
+    // Execute instructions from Game ROM
+    uint8_t opcode = mem.data[PC++];
+    cycles += execute_opcode(opcode, mem);
+
+    return cycles;
+}
+
+uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
+{
+    uint32_t cycles = 0;
+    switch (opcode)
+    {
+    case NOP:
+        break;
+    default:
+        std::cerr << "Unknown opcode: " << std::hex << (opcode) << std::endl;
+    }
+
+    // bullshit for the compiler
+    mem.data[PC++] = 0x00;
+    return cycles;
+}
+
+void gb::cpu::load_rom(const std::string &rom_path, work_ram &wram)
+{
+    const auto path = std::filesystem::absolute(rom_path);
+    std::ifstream rom_file(path, std::ios::binary);
+    std::cout << "Loading ROM: " << rom_path << std::endl;
+
+    if (!rom_file)
+        throw std::runtime_error("Error loading ROM!");
+
+    // Load ROM into memory (0x0000-0x7FFF)
+    rom_file.read(reinterpret_cast<char*>(wram.data.data()), 0x8000);
+}

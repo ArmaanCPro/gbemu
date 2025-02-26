@@ -10,8 +10,9 @@ else()
 endif()
 
 set  (SOURCES
-        "src/core.h"
-        "src/core.cpp"
+        "src/gb.h"
+        "src/gb.cpp"
+        "resources/dmg_boot.h"
 )
 
 source_group("src" FILES ${SOURCES})
