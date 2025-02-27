@@ -1,4 +1,6 @@
 #pragma once
+#include "../resources/dmg_boot.h"
+
 #include <cstdint>
 #include <array>
 #include <vector>
@@ -33,6 +35,10 @@
 #define HRAM_END    0xFFFE
 #define IE_REG      0xFFFF
 
+// Special registers
+#define BOOT_ROM_DISABLE_REG 0xFF50
+
+
 namespace gb {
     class memory_map;
 }
@@ -60,7 +66,8 @@ public:
     [[nodiscard]] uint8_t read(uint16_t address) const
     {
         // Boot ROM handling (first 256 bytes)
-        if (boot_rom_enabled && address < 0x100) {
+        if (boot_rom_enabled && address <= DMG_BOOT_ROM_END)
+        {
             return boot_rom[address];
         }
 
@@ -92,6 +99,10 @@ public:
         }
         else if (address >= IO_START && address <= IO_END)
         {
+            if (address == BOOT_ROM_DISABLE_REG)
+            {
+                return boot_rom_enabled ? 0x00 : 0x01;
+            }
             return io[address - IO_START];
         }
         else if (address >= HRAM_START && address <= HRAM_END)
@@ -136,7 +147,8 @@ public:
         else if (address >= IO_START && address <= IO_END)
         {
             // Special handling for some IO registers
-            if (address == 0xFF50 && value == 0x01) {
+            if (address == BOOT_ROM_DISABLE_REG && value == 0x01)
+            {
                 boot_rom_enabled = false;  // Disable boot ROM
             }
             io[address - IO_START] = value;
@@ -161,6 +173,12 @@ public:
         rom_file.read(reinterpret_cast<char*>(rom.data()), rom.size());
     }
 
+    // for debugging/testing
+    void skip_boot_rom()
+    {
+        boot_rom_enabled = false;
+    }
+
 private:
     std::array<uint8_t, ROM_SIZE> rom;
     std::array<uint8_t, VRAM_SIZE> vram;
@@ -172,5 +190,5 @@ private:
     bool boot_rom_enabled;
 
     // Boot ROM (typically 256 bytes)
-    static constexpr std::array<uint8_t, 0x100> boot_rom{};  // Would need to be filled with actual boot ROM data
+    static constexpr std::array<uint8_t, 0x100> boot_rom = dmg_boot;  // Would need to be filled with actual boot ROM data
 };

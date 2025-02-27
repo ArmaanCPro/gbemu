@@ -34,11 +34,7 @@ void gb::cpu::power_up_sequence(memory_map& mem)
     DE.full = 0x00D8;
     HL.full = 0x014D;
 
-    // write onto memory the boot rom. boot rom actually exists in ../resources/dmg_boot.h
-    for (int i = 0; i < DMG_BOOT_ROM_SIZE; i++)
-    {
-        mem.write(i, dmg_boot[i]);
-    }
+    mem.skip_boot_rom();
 
     {
         uint32_t cycles = DMG_BOOT_ROM_SIZE;
