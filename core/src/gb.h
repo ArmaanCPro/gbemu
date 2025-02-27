@@ -59,5 +59,7 @@ struct gb::cpu
 
     void init_instruction_table();
 
-    uint32_t nop(memory_map&) const { return 0; }
+    uint32_t invalid_opcode(memory_map&);
+    uint32_t nop(memory_map&) { return 0; }
+    uint32_t ld_bc_nn(memory_map& mem);
 };

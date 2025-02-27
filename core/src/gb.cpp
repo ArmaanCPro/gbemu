@@ -15,22 +15,11 @@ uint32_t gb::cpu::execute(memory_map& mem)
 uint32_t gb::cpu::execute_opcode(uint8_t opcode, memory_map& mem)
 {
     uint32_t cycles = 0;
-    // consider adding instruction table instead of switch statement
-    switch (opcode)
-    {
-        case NOP:
-            break;
-        case LD_BC_NN:
-        {
-            BC.low = mem.read(PC++);
-            cycles++;
-            BC.high = mem.read(PC++);
-            cycles++;
-        } break;
 
-        default:
-            std::cerr << "Unknown opcode: " << std::hex << (opcode) << std::endl;
-    }
+    if (instruction_table[opcode] != nullptr)
+        cycles += (this->*instruction_table[opcode])(mem);
+    else
+        std::cerr << "Unknown opcode: 0x" << std::hex << (opcode) << std::endl;
 
     return cycles;
 }
@@ -62,5 +51,22 @@ void gb::cpu::power_up_sequence(memory_map& mem)
 
 void gb::cpu::init_instruction_table()
 {
-    std::fill_n(instruction_table, 256, &cpu::nop);
+    std::fill_n(instruction_table, 256, &cpu::invalid_opcode);
+    instruction_table[NOP] = &cpu::nop;
+
+    instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
+}
+
+uint32_t gb::cpu::invalid_opcode(memory_map& mem)
+{
+    // [address, opcode]
+    std::cerr << "Invalid opcode: [ 0x" << std::hex << (PC - 1) << ", 0x" << std::hex << mem.read(PC - 1) << " ]" << std::endl;
+    return 0;
+}
+
+uint32_t gb::cpu::ld_bc_nn(memory_map& mem)
+{
+    BC.low = mem.read(PC++);
+    BC.high = mem.read(PC++);
+    return 2;
 }

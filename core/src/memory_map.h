@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <array>
+#include <filesystem>
 #include <fstream>
 
 // sizes
@@ -73,7 +74,7 @@ public:
         }
     }
 
-    void load_rom(const std::string &rom_path)
+    void load_rom(const std::filesystem::path &rom_path)
     {
         std::ifstream rom_file(rom_path, std::ios::binary);
         if (!rom_file)
