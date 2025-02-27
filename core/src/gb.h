@@ -18,6 +18,7 @@ struct gb::cpu
 {
     explicit cpu(memory_map& wram)
     {
+        init_instruction_table();
         power_up_sequence(wram);
     }
     
@@ -41,9 +42,13 @@ struct gb::cpu
     uint16_t SP;
     uint16_t PC;
 
-    // instruction table shenanigans
-    using instruction_fn = std::function<void(memory_map& mem, uint32_t& cycles)>;
-    static instruction_fn instructionTable[256];
+    /** function pointer returning uint32_t (# cycles) taking memory_map&.
+     * @param memory_map ref to a memory_map
+     * @returns # of cycles taken
+     */
+    typedef uint32_t (cpu::*instruction_fn)(memory_map&);
+    instruction_fn instruction_table[256];
+
 
     // returns the # of cycles
     uint32_t execute(memory_map& mem);
@@ -53,4 +58,6 @@ struct gb::cpu
     void power_up_sequence(memory_map& wram);
 
     void init_instruction_table();
+
+    uint32_t nop(memory_map&) const { return 0; }
 };

@@ -62,10 +62,5 @@ void gb::cpu::power_up_sequence(memory_map& mem)
 
 void gb::cpu::init_instruction_table()
 {
-    auto nop_lambda = [](memory_map& mem, uint32_t& cycles) { cycles++; };
-
-    for (int i = 0; i < 256; i++)
-    {
-        instructionTable[i] = nop_lambda;
-    }
+    std::fill_n(instruction_table, 256, &cpu::nop);
 }
