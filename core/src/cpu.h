@@ -77,4 +77,8 @@ struct gb::cpu
     uint32_t ret(memory_map& mem);
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);
+    uint32_t inc_a(memory_map&);
+    uint32_t dec_a(memory_map&);
+    uint32_t and_a(memory_map&);
+    uint32_t or_a(memory_map&);
 };

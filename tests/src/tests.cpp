@@ -13,6 +13,7 @@ public:
     {
         // put PC at a location in WRAM so that we can actually access it
         cpu.PC = 0xD000;
+        cpu.AF.low = 0x0;
     }
 };
 
@@ -259,4 +260,63 @@ TEST_F(CpuTests1, POP_BC_OperationWorks)
     EXPECT_EQ(cycles, 3);
     EXPECT_EQ(cpu.SP, 0xCF00);
     EXPECT_EQ(cpu.BC.full, 0x1234);
+}
+
+TEST_F(CpuTests1, A_Register_Arithmetic_OperationsWork)
+{
+    // test 1: inc
+    {
+        // given:
+        cpu.AF.high = 0x05;
+        mem.write(cpu.PC, INC_A);
+        
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cpu.AF.high, 0x06);
+        EXPECT_EQ(cpu.AF.low, 0x0);
+    }
+    // test 2: dec
+    {
+        // given:
+        cpu.AF.high = 0x01;
+        mem.write(cpu.PC, DEC_A);
+    
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cpu.AF.high, 0x0);
+        EXPECT_EQ(cpu.AF.low, 0x0);
+    }
+    // test 3: and w/ zero flag
+    {
+        // given:
+        cpu.AF.high = 0x00;
+        mem.write(cpu.PC, AND_A);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.low, 0x80 | 0x20);
+    }
+    // test 4: or w/o zero flag
+    {
+        // given:
+        cpu.AF.high = 0x11;
+        mem.write(cpu.PC, OR_A);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.high, 0x11);
+        EXPECT_EQ(cpu.AF.low, 0x0);
+    }
 }

@@ -40,11 +40,13 @@
 // special registers
 #define BOOT_ROM_DISABLE_REGISTER 0xFF50
 
-namespace gb {
+namespace gb 
+{
     class memory_map;
 }
 
-class gb::memory_map {
+class gb::memory_map 
+{
 public:
     memory_map()
         : rom_bank0(std::array<uint8_t, ROM_BANK_SIZE>{}),

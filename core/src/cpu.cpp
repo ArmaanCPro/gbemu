@@ -50,6 +50,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[RET] = &cpu::ret;
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
+    instruction_table[INC_A] = &cpu::inc_a;
+    instruction_table[DEC_A] = &cpu::dec_a;
+    instruction_table[AND_A] = &cpu::and_a;
+    instruction_table[OR_A] = &cpu::or_a;
 }
 
 uint32_t gb::cpu::invalid_opcode(memory_map& mem)
@@ -143,4 +147,35 @@ uint32_t gb::cpu::pop_bc(memory_map& mem)
     BC.high = mem.read(SP);
     SP++;
     return 3;
+}
+
+uint32_t gb::cpu::inc_a(memory_map&)
+{
+    AF.high++;
+    return 2;
+}
+
+uint32_t gb::cpu::dec_a(memory_map&)
+{
+    AF.high--;
+    return 2;
+}
+
+uint32_t gb::cpu::and_a(memory_map&)
+{
+    AF.high &= AF.high;
+    AF.low = 0x20; // Set half carry flag and no others
+    if (AF.high == 0)
+        AF.low |= 0x80; // Set zero flag
+
+    return 1;
+}
+
+uint32_t gb::cpu::or_a(memory_map&)
+{
+    AF.high |= AF.high;
+    AF.low = 0x0; // reset all flags
+    if (AF.high == 0)
+        AF.low |= 0x80; // set zero flag
+    return 1;
 }
