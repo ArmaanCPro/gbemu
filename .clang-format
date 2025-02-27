@@ -13,7 +13,11 @@ BraceWrapping:
   AfterExternBlock: true
   BeforeElse: true
   IndentBraces: true
+
 IndentWidth: 4
 NamespaceIndentation: All
 IndentCaseBlocks: true
 IndentCaseLabels: true
+
+PointerAlignment: Left
+ReferenceAlignment: Left
