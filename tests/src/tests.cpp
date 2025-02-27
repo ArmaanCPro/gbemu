@@ -144,7 +144,7 @@ TEST_F(CpuTests1, JR_NZ_N_OperationWorks)
         cpu.PC = 0xD000;
         cpu.AF.low = 0x00;          // Z flag is 0
         mem.write(cpu.PC, JR_NZ_N);
-        mem.write(cpu.PC + 1, -4);  // Jump backward 4 bytes
+        mem.write(cpu.PC + 1, (uint8_t)-4);  // Jump backward 4 bytes
 
         // when:
         const auto cycles = cpu.execute(mem);
