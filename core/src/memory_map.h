@@ -8,6 +8,7 @@
 #define ROM_SIZE  (0x8000)      // 32 KB        (0x0000-0x7FFF)
 #define WRAM_SIZE (8 * 1024)    // 8 KB         (0xC000-0xDFFF)
 #define HRAM_SIZE (127)         // 127 bytes    (0xFF80-0xFFFE)
+#define VRAM_SIZE (8 * 1024)     // 8 KB         (0x8000-0x9FFF)
 
 // address locations
 #define ROM_START   0x0000
@@ -16,6 +17,8 @@
 #define WRAM_END    0xDFFF
 #define HRAM_START  0xFF80
 #define HRAM_END    0xFFFE
+#define VRAM_START  0x8000
+#define VRAM_END    0x9FFF
 
 namespace gb
 {
@@ -30,11 +33,13 @@ public:
     : // shady initialization code. maybe not though
     rom(std::array<uint8_t, ROM_SIZE>{}),
     wram(std::array<uint8_t, WRAM_SIZE>{}),
-    hram(std::array<uint8_t, HRAM_SIZE>{})
+    hram(std::array<uint8_t, HRAM_SIZE>{}),
+    vram(std::array<uint8_t, VRAM_SIZE>{})
     {
         rom.fill(0);
         wram.fill(0);
         hram.fill(0);
+        vram.fill(0);
     }
 
 
@@ -82,4 +87,5 @@ private:
     std::array<uint8_t, ROM_SIZE> rom;
     std::array<uint8_t, WRAM_SIZE> wram;
     std::array<uint8_t, HRAM_SIZE> hram;
+    std::array<uint8_t, VRAM_SIZE> vram;
 };
