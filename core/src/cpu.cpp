@@ -13,7 +13,7 @@ uint32_t gb::cpu::execute(memory_map& mem)
     if (opcode == CB_PREFIX)
     {
         // TODO CB opcode bullshits. maybe have another jump table for cb instructions
-        uint8_t cb_opcode = mem.read(PC++);
+        //uint8_t cb_opcode = mem.read(PC++);
         // cb_instruction_table[cb_opcode]
     }
     else if (instruction_table[opcode] != nullptr)
@@ -42,7 +42,7 @@ void gb::cpu::power_up_sequence(memory_map& mem)
 
     {
         uint32_t cycles = DMG_BOOT_ROM_SIZE;
-        while (PC <= 0x50)
+        while (PC <= DMG_BOOT_ROM_END)
             cycles -= execute(mem);
     }
 
