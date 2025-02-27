@@ -2,20 +2,34 @@
 
 #include "gb.h"
 
-int main()
+int main(int argc, char* argv[])
 {
     gb::work_ram mem;
-    gb::cpu cpu {mem};
+    gb::cpu cpu { mem };
 
-    std::cout << "PC: " << std::hex << cpu.PC << std::endl;
 
-    mem.data[cpu.PC] = gb::cpu::LD_BC_NN;
-    mem.data[cpu.PC + 1] = 0x51;
-    mem.data[cpu.PC + 2] = 0x21;
+    if (argc == 2)
+    {
+        cpu.load_rom(argv[1], mem);
+    }
+    else
+    {
+        std::cerr << "Usage: app.exe <rom_path>" << std::endl;
+        //return -1;
+    }
 
-    cpu.execute(mem);
-    cpu.execute(mem);
 
-    std::cout << "BC: " << std::hex << cpu.BC.full << std::endl;
+    while (true)
+    {
+        try
+        {
+            cpu.execute(mem);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
+    }
     return 0;
 }

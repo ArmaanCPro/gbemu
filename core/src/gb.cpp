@@ -32,8 +32,6 @@ uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
             std::cerr << "Unknown opcode: " << std::hex << (opcode) << std::endl;
     }
 
-    // bullshit for the compiler
-    mem.data[PC++] = 0x00;
     return cycles;
 }
 

@@ -28,6 +28,7 @@ struct gb::cpu
     {
         power_up_sequence(wram);
     }
+    
     // allows viewing a register as both a 16 bit and 2 8 bit values
     union Register16
     {
@@ -39,19 +40,15 @@ struct gb::cpu
         };
     };
 
-    // -- registers --
-    // these are commonly accessed as 1 16-bit or 2 8-bit registers
     Register16 AF; // Accumulator and flags. bit 7 = z, 6 = n, 5 = h, 4 = c
     Register16 BC;
     Register16 DE;
     Register16 HL;
 
     // these are accessed usually only as a full 16-bit register
-    uint16_t SP;    // Stack Pointer
-    uint16_t PC;    // Program Counter/Pointer
-    // -------------
+    uint16_t SP;
+    uint16_t PC;
 
-    // high ram
     std::array<uint8_t, HRAM_SIZE> high_ram;
 
     static constexpr uint8_t
@@ -168,7 +165,6 @@ struct gb::cpu
     uint32_t execute_opcode(uint8_t opcode, work_ram& mem);
 
     void load_rom(const std::string& rom_path, work_ram& mem);
-
 
     void power_up_sequence(work_ram& wram);
 };
