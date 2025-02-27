@@ -1,0 +1,7 @@
+{
+  "name": "gbemu",
+  "version": "0.1.0",
+  "dependencies": [
+  ],
+  "builtin-baseline": "11be7f536538ace43f867c8efb3d624c43b6af54"
+}

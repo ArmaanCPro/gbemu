@@ -52,6 +52,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
     instruction_table[LD_A_N] = &cpu::ld_a_n;
     instruction_table[JP_NN] = &cpu::jp_nn;
+    instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
 }
 
 uint32_t gb::cpu::invalid_opcode(memory_map& mem)
@@ -91,16 +92,16 @@ uint32_t gb::cpu::ld_a_n(memory_map& mem)
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)
 {
-    PC = mem.read(PC) << 8 | mem.read(PC + 1);
+    PC = mem.read(PC) | mem.read(PC + 1) << 8; // low | high << 8
     return 3;
 }
 
 uint32_t gb::cpu::jr_nz_n(memory_map& mem)
 {
     const int8_t offset = static_cast<int8_t>(mem.read(PC++));
-    if (!(AF.low & 0x80))
+    if (!(AF.low & 0x40))  // Check Zero flag (bit 6)
     {
-        PC += offset - 1;
+        PC += offset;
         return 3;
     }
     return 2;

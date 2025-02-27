@@ -24,3 +24,8 @@ set(CMAKE_CXX_STANDARD 23)
 
 add_subdirectory(core)
 add_subdirectory(app)
+
+# testing stuff
+enable_testing()
+include(CTest)
+add_subdirectory(tests)

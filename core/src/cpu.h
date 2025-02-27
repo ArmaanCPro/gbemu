@@ -33,7 +33,7 @@ struct gb::cpu
         };
     };
 
-    Register16 AF; // Accumulator and flags. bit 7 = z, 6 = n, 5 = h, 4 = c
+    Register16 AF; // Accumulator and flags. bit 7 (0x80) = z, 6 (0x40) = n, 5 (0x20) = h, 4 (0x10) = c
     Register16 BC;
     Register16 DE;
     Register16 HL;
