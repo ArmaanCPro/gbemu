@@ -24,7 +24,7 @@ uint32_t gb::cpu::execute(memory_map& mem)
     return cycles;
 }
 
-void gb::cpu::power_up_sequence(memory_map& mem)
+void gb::cpu::power_up_sequence()
 {
     // init cpu registers
     SP = 0xFFFE;
@@ -33,16 +33,6 @@ void gb::cpu::power_up_sequence(memory_map& mem)
     BC.full = 0x0013;
     DE.full = 0x00D8;
     HL.full = 0x014D;
-
-    mem.skip_boot_rom();
-
-    {
-        uint32_t cycles = DMG_BOOT_ROM_SIZE;
-        while (PC <= DMG_BOOT_ROM_END)
-            cycles -= execute(mem);
-    }
-
-    PC = 0x0000;
 }
 
 void gb::cpu::init_instruction_table()

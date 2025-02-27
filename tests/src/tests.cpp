@@ -6,8 +6,8 @@
 class CpuTests1 : public ::testing::Test
 {
 public:
-    gb::memory_map mem;
-    gb::cpu cpu { mem };
+    gb::memory_map mem {};
+    gb::cpu cpu {};
 
     void SetUp() override
     {

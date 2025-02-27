@@ -16,7 +16,7 @@ namespace gb
 
 struct gb::cpu
 {
-    explicit cpu(memory_map& wram)
+    explicit cpu()
         :
         AF(),
         BC(),
@@ -27,7 +27,7 @@ struct gb::cpu
         instruction_table{}
     {
         init_instruction_table();
-        power_up_sequence(wram);
+        power_up_sequence();
     }
     
     // allows viewing a register as both a 16 bit and 2 8 bit values
@@ -60,7 +60,7 @@ struct gb::cpu
     // returns the # of machine cycles (1 mc = 4 clock cycles)
     uint32_t execute(memory_map& mem);
 
-    void power_up_sequence(memory_map& wram);
+    void power_up_sequence();
 
     void init_instruction_table();
 
