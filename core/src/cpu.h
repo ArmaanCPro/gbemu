@@ -17,6 +17,14 @@ namespace gb
 struct gb::cpu
 {
     explicit cpu(memory_map& wram)
+        :
+        AF(),
+        BC(),
+        DE(),
+        HL(),
+        SP(0),
+        PC(0),
+        instruction_table{}
     {
         init_instruction_table();
         power_up_sequence(wram);
@@ -65,5 +73,8 @@ struct gb::cpu
     uint32_t ld_a_n(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jr_nz_n(memory_map& mem);
-
+    uint32_t call_nn(memory_map& mem);
+    uint32_t ret(memory_map& mem);
+    uint32_t push_bc(memory_map& mem);
+    uint32_t pop_bc(memory_map& mem);
 };
