@@ -4,9 +4,18 @@
 #include <array>
 #include <fstream>
 
+// sizes
 #define ROM_SIZE  (0x8000)      // 32 KB        (0x0000-0x7FFF)
 #define WRAM_SIZE (8 * 1024)    // 8 KB         (0xC000-0xDFFF)
 #define HRAM_SIZE (127)         // 127 bytes    (0xFF80-0xFFFE)
+
+// address locations
+#define ROM_START   0x0000
+#define ROM_END     0x7FFF
+#define WRAM_START  0xC000
+#define WRAM_END    0xDFFF
+#define HRAM_START  0xFF80
+#define HRAM_END    0xFFFE
 
 namespace gb
 {
@@ -15,7 +24,7 @@ namespace gb
 
 class gb::memory_map
 {
-    
+
 public:
     memory_map()
     : // shady initialization code. maybe not though
@@ -31,32 +40,32 @@ public:
 
     [[nodiscard]] uint8_t read(uint16_t address) const
     {
-        if (address <= 0x7FFF)
+        if (address <= ROM_END)
         {
             return rom[address];
         }
-        else if (address >= 0xC000 && address <= 0xDFFF)
+        else if (address >= WRAM_START && address <= WRAM_END)
         {
-            return wram[address - 0xC000];
+            return wram[address - WRAM_START];
         }
-        else if (address >= 0xFF80 && address <= 0xFFFE)
+        else if (address >= HRAM_START && address <= HRAM_END)
         {
-            return hram[address - 0xFF80];
+            return hram[address - HRAM_START];
         }
         return 0xFF;
     }
 
     void write(uint16_t address, uint8_t value)
     {
-        if (address >= 0xC000 && address <= 0xDFFF)
-        {
-            wram[address - 0xC000] = value;
-        }
-        else if (address >= 0xFF80 && address <= 0xFFFE)
-        {
-            hram[address - 0xFF80] = value;
-        }
         // rom area is read-only, so no writes
+        if (address >= WRAM_START && address <= WRAM_END)
+        {
+            wram[address - WRAM_START] = value;
+        }
+        else if (address >= HRAM_START && address <= HRAM_END)
+        {
+            hram[address - HRAM_START] = value;
+        }
     }
 
     void load_rom(const std::string &rom_path)
