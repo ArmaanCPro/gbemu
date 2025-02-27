@@ -1,6 +1,9 @@
 #pragma once
 #include <cstdint>
 
+// n = d8/a8/s2
+// nn = d16/a16/s16
+
 static constexpr uint8_t
     // 8-bit Load Instructions
     LD_B_B       = 0x40,

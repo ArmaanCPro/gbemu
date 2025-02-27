@@ -44,22 +44,26 @@ struct gb::cpu
 
     /** function pointer returning uint32_t (# cycles) taking memory_map&.
      * @param memory_map ref to a memory_map
-     * @returns # of cycles taken
+     * @returns # of machine cycles taken
      */
     typedef uint32_t (cpu::*instruction_fn)(memory_map&);
     instruction_fn instruction_table[256];
 
-
-    // returns the # of cycles
+    // returns the # of machine cycles (1 mc = 4 clock cycles)
     uint32_t execute(memory_map& mem);
-
-    uint32_t execute_opcode(uint8_t opcode, memory_map& mem);
 
     void power_up_sequence(memory_map& wram);
 
     void init_instruction_table();
 
+
     uint32_t invalid_opcode(memory_map&);
-    uint32_t nop(memory_map&) { return 0; }
+    uint32_t nop(memory_map&) { return 1; }
     uint32_t ld_bc_nn(memory_map& mem);
+    uint32_t ld_hl_nn(memory_map& mem);
+    uint32_t ld_hld_a(memory_map& mem);
+    uint32_t ld_a_n(memory_map& mem);
+    uint32_t jp_nn(memory_map& mem);
+    uint32_t jr_nz_n(memory_map& mem);
+
 };

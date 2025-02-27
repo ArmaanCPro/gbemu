@@ -10,8 +10,8 @@ else()
 endif()
 
 set  (SOURCES
-        "src/gb.h"
-        "src/gb.cpp"
+        "src/cpu.h"
+        "src/cpu.cpp"
         "resources/dmg_boot.h"
         "src/memory_map.h"
         resources/dmg_opcodes.h

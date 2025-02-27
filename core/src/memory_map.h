@@ -9,7 +9,7 @@
 #define ROM_SIZE  (0x8000)      // 32 KB        (0x0000-0x7FFF)
 #define WRAM_SIZE (8 * 1024)    // 8 KB         (0xC000-0xDFFF)
 #define HRAM_SIZE (127)         // 127 bytes    (0xFF80-0xFFFE)
-#define VRAM_SIZE (8 * 1024)     // 8 KB         (0x8000-0x9FFF)
+#define VRAM_SIZE (8 * 1024)    // 8 KB         (0x8000-0x9FFF)
 
 // address locations
 #define ROM_START   0x0000
@@ -58,6 +58,10 @@ public:
         {
             return hram[address - HRAM_START];
         }
+        else if (address >= VRAM_START && address <= VRAM_END)
+        {
+            return vram[address - VRAM_START];
+        }
         return 0xFF;
     }
 
@@ -71,6 +75,10 @@ public:
         else if (address >= HRAM_START && address <= HRAM_END)
         {
             hram[address - HRAM_START] = value;
+        }
+        else if (address >= VRAM_START && address <= VRAM_END)
+        {
+            vram[address - VRAM_START] = value;
         }
     }
 
