@@ -13,6 +13,7 @@ set  (SOURCES
         "src/gb.h"
         "src/gb.cpp"
         "resources/dmg_boot.h"
+        src/memory_map.h
 )
 
 source_group("src" FILES ${SOURCES})

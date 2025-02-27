@@ -6,25 +6,17 @@
 #include <fstream>
 
 #include "../resources/dmg_boot.h"
-
-#define WRAM_SIZE (8 * 1024)    // 8 KB
-#define HRAM_SIZE (8 * 127)     // 80 bytes
+#include "memory_map.h"
 
 namespace gb
 {
-    struct work_ram;
     struct cpu;
 }
-
-struct gb::work_ram
-{
-    std::array<uint8_t, WRAM_SIZE> data;
-};
 
 
 struct gb::cpu
 {
-    explicit cpu(work_ram& wram)
+    explicit cpu(memory_map& wram)
     {
         power_up_sequence(wram);
     }
@@ -48,8 +40,6 @@ struct gb::cpu
     // these are accessed usually only as a full 16-bit register
     uint16_t SP;
     uint16_t PC;
-
-    std::array<uint8_t, HRAM_SIZE> high_ram;
 
     static constexpr uint8_t
         // NOP & Jump Instructions
@@ -104,67 +94,10 @@ struct gb::cpu
         EI          = 0xFB
     ;
 
-    [[nodiscard]] inline uint8_t read_hram(uint16_t address)
-    {
-        if (address >= 0xFF80 && address <= 0xFFFE)
-        {
-            return high_ram[address - 0xFF80];
-        }
-        throw std::out_of_range("HRAM access out of range");
-    }
-
-    inline void write_hram(uint16_t address, uint8_t value)
-    {
-        if (address >= 0xFF80 && address <= 0xFFFE)
-        {
-            high_ram[address - 0xFF80] = value;
-            return;
-        }
-        throw std::out_of_range("HRAM access out of range");
-    }
-
-    [[nodiscard]] inline uint8_t read_byte(work_ram& mem, uint32_t& cycles)
-    {
-        cycles++;
-        if (PC >= 0xFF80 && PC <= 0xFFFE)
-        {
-            // Handle HRAM access
-            return read_hram(PC++);
-        }
-        else if (PC < mem.data.size())
-        {
-            // Handle WRAM access
-            return mem.data[PC++];
-        }
-        throw std::out_of_range("Invalid memory read");
-    }
-
-    inline void write_byte(work_ram& mem, uint16_t address, uint8_t value, uint32_t& cycles)
-    {
-        cycles++;
-        if (address >= 0xFF80 && address <= 0xFFFE)
-        {
-            // Handle HRAM access
-            write_hram(address, value);
-        }
-        else if (address < mem.data.size())
-        {
-            // Handle WRAM access
-            mem.data[address] = value;
-        }
-        else
-        {
-            throw std::out_of_range("Invalid memory write");
-        }
-    }
-
-
     // returns the # of cycles
-    uint32_t execute(work_ram& mem);
+    uint32_t execute(memory_map& mem);
 
-    uint32_t execute_opcode(uint8_t opcode, work_ram& mem);
+    uint32_t execute_opcode(uint8_t opcode, memory_map& mem);
 
-    void load_rom(const std::string& rom_path, work_ram& mem);
-
-    void power_up_sequence(work_ram& wram);
+    void power_up_sequence(memory_map& wram);
 };

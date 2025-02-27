@@ -4,20 +4,19 @@
 
 int main(int argc, char* argv[])
 {
-    gb::work_ram mem;
+    gb::memory_map mem {};
     gb::cpu cpu { mem };
 
 
     if (argc == 2)
     {
-        cpu.load_rom(argv[1], mem);
+        mem.load_rom(argv[1]);
     }
     else
     {
         std::cerr << "Usage: app.exe <rom_path>" << std::endl;
         //return -1;
     }
-
 
     while (true)
     {

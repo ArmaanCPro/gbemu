@@ -3,18 +3,15 @@
 #include <iostream>
 #include <filesystem>
 
-uint32_t gb::cpu::execute(work_ram& mem)
+uint32_t gb::cpu::execute(memory_map& mem)
 {
-    uint32_t cycles = 0;
-
-    // Execute instructions from Game ROM
-    uint8_t opcode = mem.data[PC++];
+    const uint8_t opcode = mem.read(PC++);
+    uint32_t cycles = 1; // reading the opcode takes a cycle
     cycles += execute_opcode(opcode, mem);
-
     return cycles;
 }
 
-uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
+uint32_t gb::cpu::execute_opcode(uint8_t opcode, memory_map& mem)
 {
     uint32_t cycles = 0;
     // consider adding instruction table instead of switch statement
@@ -24,8 +21,10 @@ uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
             break;
         case LD_BC_NN:
         {
-            BC.low = read_byte(mem, cycles);
-            BC.high = read_byte(mem, cycles);
+            BC.low = mem.read(PC++);
+            cycles++;
+            BC.high = mem.read(PC++);
+            cycles++;
         } break;
 
         default:
@@ -35,45 +34,27 @@ uint32_t gb::cpu::execute_opcode(uint8_t opcode, work_ram &mem)
     return cycles;
 }
 
-void gb::cpu::load_rom(const std::string &rom_path, work_ram &wram)
-{
-    const auto path = std::filesystem::absolute(rom_path);
-    std::ifstream rom_file(path, std::ios::binary);
-    std::cout << "Loading ROM: " << rom_path << std::endl;
-
-    if (!rom_file)
-        throw std::runtime_error("Error loading ROM!");
-
-    // Load ROM into memory (0x0000-0x7FFF)
-    rom_file.read(reinterpret_cast<char*>(wram.data.data()), 0x8000);
-}
-
-void gb::cpu::power_up_sequence(work_ram &wram)
+void gb::cpu::power_up_sequence(memory_map& mem)
 {
     // init cpu registers
     SP = 0xFFFE;
-    PC = 0x0000; // Start with Boot ROM
+    PC = 0x0000;
     AF.full = 0x01B0;
     BC.full = 0x0013;
     DE.full = 0x00D8;
     HL.full = 0x014D;
 
-    // init memory
-    wram.data.fill(0);
-    high_ram.fill(0);
-
+    // write onto memory the boot rom. boot rom actually exists in ../resources/dmg_boot.h
     for (int i = 0; i < DMG_BOOT_ROM_SIZE; i++)
     {
-        wram.data[i] = dmg_boot[i];
+        mem.write(i, dmg_boot[i]);
     }
 
     {
         uint32_t cycles = DMG_BOOT_ROM_SIZE;
         while (PC <= 0x50)
-            cycles -= execute(wram);
-
-        wram.data.fill(0); // remove boot sequence from memory
+            cycles -= execute(mem);
     }
 
-    PC = 0x0100;
+    PC = 0x0000;
 }
