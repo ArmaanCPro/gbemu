@@ -58,9 +58,8 @@ void gb::cpu::init_instruction_table()
 uint32_t gb::cpu::invalid_opcode(memory_map& mem)
 {
     // [address, opcode]
-    std::stringstream ss;
-    ss << "Invalid opcode: ( 0x" << std::hex << (PC - 1) << ", 0x" << std::hex << mem.read(PC - 1) << " )";
-    throw std::runtime_error(ss.str());
+    std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
+    return 0;
 }
 
 uint32_t gb::cpu::ld_bc_nn(memory_map& mem)
