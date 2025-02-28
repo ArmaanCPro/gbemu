@@ -27,15 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check Visual Studio installation
+        run: |
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+
       - name: Configure CMake
-        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
         run: >
-          cmake --preset ${{ env.config_preset }}  -B ${{ github.workspace }}/build 
-          -G ${{env.generator}}
+          cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build 
+          -G "${{ env.generator }}"
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-          -DCMAKE_CXX_COMPILER=${{ env.c_compiler }} 
-          -DCMAKE_C_COMPILER=${{ env.cpp_compiler }}
+          -DCMAKE_CXX_COMPILER=${{ env.cpp_compiler }} 
+          -DCMAKE_C_COMPILER=${{ env.c_compiler }}
           -S ${{ github.workspace }}
 
       - name: Build
