@@ -14,6 +14,7 @@ env:
   c_compiler: cl
   cpp_compiler: cl
   config_preset: release-msvc
+  generator: Visual Studio 17 2022
 
 jobs:
   build:
@@ -31,6 +32,7 @@ jobs:
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
         run: >
           cmake --preset ${{ env.config_preset }}  -B ${{ github.workspace }}/build 
+          -G ${{env.generator}}
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
           -DCMAKE_CXX_COMPILER=${{ env.c_compiler }} 
           -DCMAKE_C_COMPILER=${{ env.cpp_compiler }}
