@@ -14,7 +14,7 @@ env:
   c_compiler: cl
   cpp_compiler: cl
   config_preset: release-msvc
-  generator: Visual Studio 17 2022
+  generator: "Visual Studio 17 2022"
 
 jobs:
   build:
