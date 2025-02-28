@@ -1,5 +1,14 @@
 cmake_minimum_required (VERSION 3.28)
 
+# won't always work. However, you can always use a preset.
+if (MINGW)
+    set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+    set(VCPKG_HOST_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+elseif(VCPKG_CMAKE_SYSTEM STREQUAL MINGW)
+    set(VCPKG_TARGET_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+    set(VCPKG_HOST_TRIPLET "x64-mingw-dynamic" CACHE STRING "")
+endif()
+
 # link vcpkg packages.
 if (DEFINED ENV{VCPKG_ROOT})
     set(VCPKG_ROOT $ENV{VCPKG_ROOT})

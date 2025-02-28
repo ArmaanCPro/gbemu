@@ -14,11 +14,18 @@ set  (SOURCES
         "src/cpu.cpp"
         "resources/dmg_boot.h"
         "src/memory_map.h"
-        resources/dmg_opcodes.h
+        "resources/dmg_opcodes.h"
+        "src/ppu.h"
+        "src/ppu.cpp"
 )
 
 source_group("src" FILES ${SOURCES})
 
+
 add_library( core ${SOURCES} )
 
 target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/src" )
+
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+target_link_libraries(core PUBLIC glfw glad::glad)

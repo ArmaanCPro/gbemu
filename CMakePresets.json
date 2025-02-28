@@ -7,26 +7,56 @@
     },
     "configurePresets": [
         {
-            "name": "common",
+            "name": "default",
             "hidden": true,
             "generator": "Ninja",
             "binaryDir": "build/${presetName}"
         },
         {
-            "name": "debug",
+            "name": "debug-default",
             "displayName": "Debug",
-            "inherits": "common",
+            "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "release",
+            "name": "release-default",
             "displayName": "Release",
-            "inherits": "common",
+            "inherits": "default",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
+        },
+
+
+        {
+            "name": "mingw-common",
+            "hidden": true,
+            "generator": "MinGW Makefiles",
+            "binaryDir": "build/${presetName}",
+            "cacheVariables": {
+              "VCPKG_CMAKE_SYSTEM": "MINGW",
+              "VCPKG_DEFAULT_TRIPLET": "x64-mingw-dynamic",
+              "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic"
+            }
+        },
+
+        {
+          "name": "debug-mingw",
+          "displayName": "Debug MinGW",
+          "inherits": "mingw-common",
+          "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Debug"
+          }
+        },
+        {
+          "name": "release-mingw",
+          "displayName": "Release MinGW",
+          "inherits": "mingw-common",
+          "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Release"
+          }
         }
     ],
 
@@ -34,16 +64,17 @@
         {
             "name": "app-debug",
             "displayName": "Debug Build",
-            "configurePreset": "debug",
+            "configurePreset": "debug-default",
             "configuration": "Debug",
             "targets": [ "app" ]
         },
         {
             "name": "app-release",
             "displayName": "Release Build",
-            "configurePreset": "release",
+            "configurePreset": "release-default",
             "configuration": "Release",
             "targets": [ "app" ]
         }
     ]
+
 }
