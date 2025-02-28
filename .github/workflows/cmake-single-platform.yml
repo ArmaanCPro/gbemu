@@ -27,10 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Visual Studio installation
-        run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
-
       - name: Configure CMake
         run: >
           cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build 
