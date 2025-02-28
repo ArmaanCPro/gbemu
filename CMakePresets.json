@@ -5,59 +5,88 @@
         "minor": 28,
         "patch": 0
     },
-    "configurePresets": [
-        {
-            "name": "default",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "build/${presetName}"
-        },
-        {
-            "name": "debug-default",
-            "displayName": "Debug",
-            "inherits": "default",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }
-        },
-        {
-            "name": "release-default",
-            "displayName": "Release",
-            "inherits": "default",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }
-        },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "build/${presetName}"
+    },
+    {
+      "name": "debug-default",
+      "displayName": "Debug",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release-default",
+      "displayName": "Release",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
 
-        {
-            "name": "mingw-common",
-            "hidden": true,
-            "generator": "MinGW Makefiles",
-            "binaryDir": "build/${presetName}",
-            "cacheVariables": {
-              "VCPKG_CMAKE_SYSTEM": "MINGW",
-              "VCPKG_DEFAULT_TRIPLET": "x64-mingw-static",
-              "VCPKG_HOST_TRIPLET": "x64-mingw-static"
-            }
-        },
+    {
+      "name": "msvc-common",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "CMAKE_C_COMPILER": "cl.exe",
+        "VCPKG_CMAKE_SYSTEM": "MSVC",
+        "VCPKG_DEFAULT_TRIPLET": "x64-windows-static",
+        "VCPKG_HOST_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "debug-msvc",
+      "displayName": "Debug MSVC",
+      "inherits": "msvc-common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release-msvc",
+      "displayName": "Release MSVC",
+      "inherits": "msvc-common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
 
-        {
-          "name": "debug-mingw",
-          "displayName": "Debug MinGW",
-          "inherits": "mingw-common",
-          "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Debug"
-          }
-        },
-        {
-          "name": "release-mingw",
-          "displayName": "Release MinGW",
-          "inherits": "mingw-common",
-          "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Release"
-          }
-        }
-    ],
+    {
+      "name": "mingw-common",
+      "hidden": true,
+      "generator": "MinGW Makefiles",
+      "binaryDir": "build/${presetName}",
+      "cacheVariables": {
+        "VCPKG_CMAKE_SYSTEM": "MINGW",
+        "VCPKG_DEFAULT_TRIPLET": "x64-mingw-static",
+        "VCPKG_HOST_TRIPLET": "x64-mingw-static"
+      }
+    },
+    {
+      "name": "debug-mingw",
+      "displayName": "Debug MinGW",
+      "inherits": "mingw-common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release-mingw",
+      "displayName": "Release MinGW",
+      "inherits": "mingw-common",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
 
     "buildPresets": [
         {

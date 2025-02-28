@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
     mem.skip_boot_rom();
     gb::cpu cpu {};
 
-    if (!std::filesystem::exists(argv[1]))
+    if (argc == 2 && !std::filesystem::exists(argv[1]))
     {
         std::cerr << "File does not exist: " << std::filesystem::absolute(argv[1]) << std::endl;
         return -1;

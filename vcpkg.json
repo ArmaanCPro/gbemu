@@ -5,7 +5,6 @@
 
   "dependencies": [
 
-    "gtest",
     "glfw3",
     {
       "name": "glad",
