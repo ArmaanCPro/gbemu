@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.28)
 
 project(tests)
 
@@ -19,7 +19,7 @@ source_group("src" FILES ${SOURCES})
 
 add_executable( tests ${SOURCES} )
 add_dependencies( tests core )
-target_link_libraries(tests core)
+target_link_libraries(tests PRIVATE core)
 
 # google test bullshits. wasn't working with vcpkg so I just decided to use cmake FetchContent
 include(FetchContent)
@@ -33,6 +33,8 @@ FetchContent_MakeAvailable(googletest)
 
 target_link_libraries(
         tests
+        PRIVATE
+        GTest::gtest
         GTest::gtest_main
 )
 

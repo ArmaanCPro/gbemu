@@ -1,6 +1,27 @@
 cmake_minimum_required (VERSION 3.28)
 
-# link vcpkg packages.
+
+# MINGW keyword doesn't always work. However, selecting the preset usually works. VCPKG_CM... is defined by preset
+if (MINGW OR VCPKG_CMAKE_SYSTEM STREQUAL MINGW)
+    set(VCPKG_TARGET_TRIPLET "x64-mingw-static" CACHE STRING "")
+    set(VCPKG_HOST_TRIPLET "x64-mingw-static" CACHE STRING "")
+endif()
+
+# enforce static linking in msvc. not sure if this is needed
+if(MSVC OR VCPKG_CMAKE_SYSTEM STREQUAL MSVC)
+    set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
+    set(VCPKG_HOST_TRIPLET "x64-windows-static" CACHE STRING "")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    add_compile_options(
+            $<$<CONFIG:>:/MT>
+            $<$<CONFIG:Debug>:/MTd>
+            $<$<CONFIG:Release>:/MT>
+    )
+endif()
+
+set(VCPKG_LIBRARY_LINKAGE "static" CACHE STRING "" FORCE)
+
+# vcpkg
 if (DEFINED ENV{VCPKG_ROOT})
     set(VCPKG_ROOT $ENV{VCPKG_ROOT})
 else ()
