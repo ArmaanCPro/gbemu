@@ -31,7 +31,6 @@ target_link_libraries(
         tests
         PRIVATE
         GTest::gtest
-        GTest::gtest_main
 )
 
 include(GoogleTest)
