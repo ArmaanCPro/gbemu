@@ -9,11 +9,12 @@ int main(int argc, char* argv[])
     gb::cpu cpu {};
 
     if (!std::filesystem::exists(argv[1]))
+    {
         std::cerr << "File does not exist: " << std::filesystem::absolute(argv[1]) << std::endl;
-
+        return -1;
+    }
     else if (argc == 2)
         mem.load_rom(std::filesystem::absolute(argv[1]));
-
     else
     {
         std::cerr << "Usage: app.exe <rom absolute path>" << std::endl;

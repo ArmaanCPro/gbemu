@@ -2,7 +2,9 @@
   "name": "gbemu",
   "version": "0.1.0",
   "builtin-baseline": "11be7f536538ace43f867c8efb3d624c43b6af54",
+
   "dependencies": [
+
     "gtest",
     "glfw3",
     {
@@ -11,5 +13,6 @@
         "gl-api-latest"
       ]
     }
+
   ]
 }

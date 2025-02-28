@@ -29,7 +29,6 @@
             }
         },
 
-
         {
             "name": "mingw-common",
             "hidden": true,
@@ -37,8 +36,8 @@
             "binaryDir": "build/${presetName}",
             "cacheVariables": {
               "VCPKG_CMAKE_SYSTEM": "MINGW",
-              "VCPKG_DEFAULT_TRIPLET": "x64-mingw-dynamic",
-              "VCPKG_HOST_TRIPLET": "x64-mingw-dynamic"
+              "VCPKG_DEFAULT_TRIPLET": "x64-mingw-static",
+              "VCPKG_HOST_TRIPLET": "x64-mingw-static"
             }
         },
 
