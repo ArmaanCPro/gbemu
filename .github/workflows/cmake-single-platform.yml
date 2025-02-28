@@ -11,6 +11,9 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  c_compiler: cl
+  cpp_compiler: cl
+  config_preset: release-msvc
 
 jobs:
   build:
@@ -19,21 +22,27 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
 
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Configure CMake
         # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
         # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-        run: cmake --preset release-msvc -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+        run: >
+          cmake --preset ${{ env.config_preset }}  -B ${{ github.workspace }}/build 
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          -DCMAKE_CXX_COMPILER=${{ env.c_compiler }} 
+          -DCMAKE_C_COMPILER=${{ env.cpp_compiler }}
+          -S ${{ github.workspace }}
 
       - name: Build
         # Build your program with the given configuration
-        run: cmake --build ${{github.workspace}}/build --preset release-msvc --config ${{env.BUILD_TYPE}}
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Test
         working-directory: ${{github.workspace}}/build
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-        run: ctest --preset release-msvc -C ${{env.BUILD_TYPE}}
+        run: ctest -C ${{env.BUILD_TYPE}}
 
