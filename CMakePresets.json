@@ -7,7 +7,7 @@
     },
   "configurePresets": [
     {
-      "name": "default",
+      "name": "default-common",
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "build/${presetName}",
@@ -18,7 +18,7 @@
     {
       "name": "debug-default",
       "displayName": "Debug",
-      "inherits": "default",
+      "inherits": "default-common",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       }
@@ -26,7 +26,7 @@
     {
       "name": "release-default",
       "displayName": "Release",
-      "inherits": "default",
+      "inherits": "default-common",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
