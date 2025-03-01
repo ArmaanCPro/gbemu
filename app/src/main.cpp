@@ -3,19 +3,19 @@
 
 #include "cpu.h"
 #include "window.h"
+#include "ppu.h"
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
-#define SCREEN_MULTIPLIER 5
+#define SCREEN_MULTIPLIER 3
 
 int main(int argc, char* argv[])
 {
     window win { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER, "gbemu" };
     gb::memory_map mem {};
     mem.skip_boot_rom();
-    gb::cpu cpu {};
-
-
+    gb::cpu cpu{};
+    gb::ppu ppu{};
 
     bool skip_rom_execution = false;
 
@@ -33,15 +33,14 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    uint32_t cycles = 0;
-
     while (!win.should_close())
     {
         if (!skip_rom_execution)
         {
             try
             {
-                cycles += cpu.execute(mem);
+                const uint32_t cycles = cpu.execute(mem);
+                ppu.tick(cycles, mem);
             }
             catch(const std::exception& e)
             {
