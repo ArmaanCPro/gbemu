@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 
 #include "cpu.h"
 #include "window.h"
@@ -14,13 +15,18 @@ int main(int argc, char* argv[])
     mem.skip_boot_rom();
     gb::cpu cpu {};
 
-    if (argc == 2 && !std::filesystem::exists(argv[1]))
+
+
+    bool skip_rom_execution = false;
+
+    if (argc == 2 && std::filesystem::exists(argv[1]))
     {
-        std::cerr << "File does not exist: " << std::filesystem::absolute(argv[1]) << std::endl;
-        return -1;
-    }
-    else if (argc == 2)
         mem.load_rom(std::filesystem::absolute(argv[1]));
+    }
+    else if (argc == 2 && strcmp(argv[1], "--skip-rom") == 0)
+    {
+        skip_rom_execution = true;
+    }
     else
     {
         std::cerr << "Usage: app.exe <rom absolute path>" << std::endl;
@@ -31,13 +37,16 @@ int main(int argc, char* argv[])
 
     while (!win.should_close())
     {
-        try
+        if (!skip_rom_execution)
         {
-            cycles += cpu.execute(mem);
-        }
-        catch(const std::exception& e)
-        {
-            std::cerr << e.what() << '\n';
+            try
+            {
+                cycles += cpu.execute(mem);
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
         }
 
         win.swap_buffers();
