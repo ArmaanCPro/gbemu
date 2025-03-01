@@ -50,10 +50,10 @@ private:
     static constexpr uint16_t WY_ADDR = 0xFF4A;
     static constexpr uint16_t WX_ADDR = 0xFF4B;
 
-    uint32_t cyclecounter_{0};
-    uint8_t currentline_{0};
-    ppu_mode mode_{ppu_mode::OAM};
-    uint32_t framebuffer_[SCREEN_WIDTH * SCREEN_HEIGHT]{};
+    uint32_t cyclecounter_ {0};
+    uint8_t currentline_ {0};
+    ppu_mode mode_ { ppu_mode::OAM };
+    uint32_t framebuffer_[SCREEN_WIDTH * SCREEN_HEIGHT] {};
 
     void render_scanline(memory_map& mem);
     void render_background(memory_map& mem, int scanline);

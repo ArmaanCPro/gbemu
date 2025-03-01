@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "cpu.h"
+#include "fb_renderer.h"
 #include "window.h"
 #include "ppu.h"
 
@@ -16,6 +17,8 @@ int main(int argc, char* argv[])
     mem.skip_boot_rom();
     gb::cpu cpu{};
     gb::ppu ppu{};
+
+    fb_renderer renderer { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER };
 
     bool skip_rom_execution = false;
 
@@ -47,6 +50,8 @@ int main(int argc, char* argv[])
                 std::cerr << e.what() << '\n';
             }
         }
+
+        renderer.render(ppu.get_framebuffer(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
         win.swap_buffers();
         win.poll_events();

@@ -19,6 +19,8 @@ set  (SOURCES
         "src/ppu.cpp"
         "src/window.h"
         "src/window.cpp"
+        "src/fb_renderer.h"
+        "src/fb_renderer.cpp"
 )
 
 source_group("src" FILES ${SOURCES})

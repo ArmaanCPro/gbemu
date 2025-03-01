@@ -97,14 +97,14 @@ void gb::ppu::render_window(memory_map& mem, int scanline)
     const bool signed_addressing = !(lcdc & 0x10);
     const uint8_t bg_palette = mem.read(BGP_ADDR);
 
-    const uint8_t window_line = scanline - wy;
+    const uint8_t window_line = (uint8_t)(scanline - wy);
     const uint8_t tile_row = window_line / 8;
 
     for (int x = 0; x < SCREEN_WIDTH - wx + 7; x++)
     {
         if (x + wx < 7) continue;
 
-        const uint8_t tile_col = x / 8;
+        const uint8_t tile_col = (uint8_t)(x / 8);
         const uint16_t tile_addr = tile_map + tile_row * 32 + tile_col;
 
         uint8_t tile_id = mem.read(tile_addr);
@@ -139,7 +139,7 @@ void gb::ppu::render_sprites(memory_map& mem, int scanline)
     };
 
     std::array<sprite, 40> sprites;
-    for (int i = 0; i < 40; i++)
+    for (uint8_t i = 0; i < 40; i++)
     {
         const uint16_t sprite_addr = 0xFE00 + i * 4;
         sprites[i].y = mem.read(sprite_addr) - 16;
@@ -163,9 +163,9 @@ void gb::ppu::render_sprites(memory_map& mem, int scanline)
         const bool flip_x = sprite.attributes & 0x20;
         const uint8_t palette = sprite.attributes & 0x10 ? mem.read(OBP1_ADDR) : mem.read(OBP0_ADDR);
 
-        uint8_t line = scanline - sprite.y;
+        uint8_t line = (uint8_t)scanline - sprite.y;
         if (flip_y)
-            line = sprite_height - 1 - line;
+            line = (uint8_t)sprite_height - 1 - line;
 
         const uint16_t tile_addr = 0x8000 + sprite.tile * 16 + (line * 2);
         const uint8_t byte1 = mem.read(tile_addr);
