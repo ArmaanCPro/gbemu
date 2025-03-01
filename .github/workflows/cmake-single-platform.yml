@@ -14,6 +14,7 @@ env:
   c_compiler: gcc
   cpp_compiler: g++
   config_preset: release-default
+  generator: "Unix Makefiles"
 
 jobs:
   build:
@@ -25,7 +26,8 @@ jobs:
 
       - name: Configure CMake
         run: >
-          cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build
+          cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build 
+          -G "${{ env.generator }}"
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
           -DCMAKE_CXX_COMPILER=${{ env.cpp_compiler }} 
           -DCMAKE_C_COMPILER=${{ env.c_compiler }}
