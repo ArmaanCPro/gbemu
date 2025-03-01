@@ -14,15 +14,26 @@ env:
   c_compiler: gcc
   cpp_compiler: g++
   config_preset: release-default
-  generator: "Unix Makefiles"
+  generator: "Ninja"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
       - uses: actions/checkout@v4
+
+      # Install required dependencies including Ninja
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libxinerama-dev \
+            libxcursor-dev \
+            xorg-dev \
+            libglu1-mesa-dev \
+            pkg-config \
+            ninja-build
 
       - name: Configure CMake
         run: >
@@ -39,4 +50,3 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         run: ctest -C ${{env.BUILD_TYPE}}
-
