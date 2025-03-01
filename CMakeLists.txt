@@ -34,12 +34,29 @@ endif()
 message(STATUS "Using VCPKG_ROOT: ${VCPKG_ROOT}")
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
 
-
+#--------
+# project
+# -------
 project (gbemu)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set(CMAKE_CXX_STANDARD 23)
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+endif() # compiler automatically adds NDEBUG if not debug mode
+
+# platform specific stuff
+if(WIN32)
+    set(GB_PLATFORM_DEFINITIONS GB_WINDOWS)
+elseif(APPLE)
+    set(GB_PLATFORM_DEFINITIONS GB_OSX)
+elseif(UNIX AND NOT APPLE)
+    set(GB_PLATFORM_DEFINITIONS GB_LINUX)
+endif()
+add_compile_definitions(${GB_PLATFORM_DEFINITIONS})
+
 
 add_subdirectory(core)
 add_subdirectory(app)

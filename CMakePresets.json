@@ -64,7 +64,7 @@
     {
       "name": "mingw-common",
       "hidden": true,
-      "generator": "MinGW Makefiles",
+      "generator": "Ninja",
       "binaryDir": "build/${presetName}",
       "cacheVariables": {
         "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg-overlays",
