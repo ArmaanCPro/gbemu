@@ -56,10 +56,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[OR_A] = &cpu::or_a;
 }
 
-uint32_t gb::cpu::invalid_opcode(memory_map& mem)
+uint32_t gb::cpu::invalid_opcode(memory_map&)
 {
     // [address, opcode]
-    std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
+    //std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
     return 0;
 }
 

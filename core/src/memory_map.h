@@ -67,6 +67,12 @@ public:
         oam.fill(0);
         io.fill(0xFF);
         hram.fill(0);
+
+        for (size_t i = 0; i < VRAM_SIZE; i += 2)
+        {
+            vram[i] = 0xFF;    // Create some visible tiles
+            vram[i + 1] = 0xFF;
+        }
     }
 
     [[nodiscard]] uint8_t read(uint16_t address) const

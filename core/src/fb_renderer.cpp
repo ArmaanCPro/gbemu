@@ -2,103 +2,110 @@
 
 #include <iostream>
 #include <ostream>
+#include <vector>
 
 fb_renderer::fb_renderer(uint32_t fb_width, uint32_t fb_height)
 {
-    constexpr float quadVertices[] = {
-        // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f
+    // Define vertices for a quad that fills the entire screen
+    const float quadVertices[] = {
+        // positions   // texture coords
+        -1.0f,  1.0f,  0.0f, 1.0f,   // top left
+         1.0f,  1.0f,  1.0f, 1.0f,   // top right
+         1.0f, -1.0f,  1.0f, 0.0f,   // bottom right
+        -1.0f,  1.0f,  0.0f, 1.0f,   // top left
+         1.0f, -1.0f,  1.0f, 0.0f,   // bottom right
+        -1.0f, -1.0f,  0.0f, 0.0f    // bottom left
     };
 
+    // Create and bind VAO first
     glGenVertexArrays(1, &vao_id_);
-    glGenBuffers(1, &vbo_id_);
-
     glBindVertexArray(vao_id_);
+
+    // Create and setup VBO
+    glGenBuffers(1, &vbo_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-
-    // position attribute
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // texture coord attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+
+    // Print the first vertex position for verification
+    std::cout << "First vertex position: " << quadVertices[0] << ", " << quadVertices[1] << std::endl;
+
     glGenTextures(1, &fb_tex_id_);
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb_width, fb_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // shader bullshit
-    unsigned int vertex, fragment;
-    int success;
-    char infoLog[512];
+    // Initialize with empty data
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-    // vertex shader
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vert_shader_, nullptr);
-    glCompileShader(vertex);
-    // check for shader compile errors
-    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    // Create vertex shader
+    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vert_shader_, NULL);
+    glCompileShader(vertexShader);
+
+    // Check vertex shader compilation
+    GLint success;
+    GLchar infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cout << "Vertex shader compilation failed:\n" << infoLog << std::endl;
     }
 
-    // fragment shader
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &frag_shader_, nullptr);
-    glCompileShader(fragment);
-    // check for shader compile errors
-    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragment, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    // Create fragment shader
+    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &frag_shader_, NULL);
+    glCompileShader(fragmentShader);
+
+    // Check fragment shader compilation
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cout << "Fragment shader compilation failed:\n" << infoLog << std::endl;
     }
 
+    // Create shader program
     shader_program_ = glCreateProgram();
-    glAttachShader(shader_program_, vertex);
-    glAttachShader(shader_program_, fragment);
+    glAttachShader(shader_program_, vertexShader);
+    glAttachShader(shader_program_, fragmentShader);
     glLinkProgram(shader_program_);
-    // check for linking errors
+
+    // Check program linking
     glGetProgramiv(shader_program_, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shader_program_, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    if (!success) {
+        glGetProgramInfoLog(shader_program_, 512, NULL, infoLog);
+        std::cout << "Shader program linking failed:\n" << infoLog << std::endl;
     }
 
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+void check_gl_error(const char* operation) {
+    GLenum err;
+    while ((err = glGetError()) != GL_NO_ERROR) {
+        std::cerr << "OpenGL error after " << operation << ": 0x" << std::hex << err << std::dec << std::endl;
+    }
 }
 
 void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
 {
+    // Update texture with new framebuffer data
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (int)fb_width, (int)fb_height, GL_RGB, GL_UNSIGNED_BYTE, fb_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, fb_data);
 
+    // Clear and draw
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shader_program_);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-
     glBindVertexArray(vao_id_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }

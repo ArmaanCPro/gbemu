@@ -1,5 +1,7 @@
 #include "ppu.h"
 
+#include <iostream>
+
 // this is a class similar to a renderer in a game engine. it doesn't actually manage the "os window"
 gb::ppu::ppu()
 {
@@ -9,7 +11,10 @@ gb::ppu::ppu()
 void gb::ppu::tick(uint32_t cycles, memory_map& mem)
 {
     if (!is_lcd_enabled(mem.read(LCDC_ADDR)))
+    {
+        std::cout << "LCD is disabled" << std::endl;
         return;
+    }
 
     cyclecounter_ += cycles;
 
@@ -37,16 +42,20 @@ void gb::ppu::tick(uint32_t cycles, memory_map& mem)
     update_mode(mem);
 }
 
-void gb::ppu::render_scanline(memory_map& mem)
+void gb::ppu::render_scanline(memory_map&)
 {
-    const uint8_t lcdc = mem.read(LCDC_ADDR);
+    // Force a test pattern
+    for (int x = 0; x < SCREEN_WIDTH; x++) {
+        uint32_t color = (x % 2 == 0) ? 0xFF0000FF : 0x00FF00FF; // Alternate red and green
+        framebuffer_[currentline_ * SCREEN_WIDTH + x] = color;
+    }
 
-    if (is_bg_enabled(lcdc))
-        render_background(mem, currentline_);
-    if (is_window_enabled(lcdc))
-        render_window(mem, currentline_);
-    if (is_sprites_enabled(lcdc))
-        render_sprites(mem, currentline_);
+    // Debug print for the first few pixels of this scanline
+    std::cout << "PPU scanline " << (int)currentline_ << " first 4 pixels: ";
+    for (int i = 0; i < 4; i++) {
+        std::cout << "0x" << std::hex << framebuffer_[currentline_ * SCREEN_WIDTH + i] << " ";
+    }
+    std::cout << std::dec << "\n";
 }
 
 void gb::ppu::render_background(memory_map& mem, int scanline)
@@ -81,6 +90,8 @@ void gb::ppu::render_background(memory_map& mem, int scanline)
         const uint8_t color_id = ((byte1 >> bit_num) & 1) | (((byte2 >> bit_num) & 1) << 1);
 
         framebuffer_[scanline * SCREEN_WIDTH + x] = get_color(color_id, bg_palette);
+
+        framebuffer_[scanline * SCREEN_WIDTH + x] = (x % 2 == 0) ? 0xFFFFFFFF : 0x00000000;
     }
 }
 
