@@ -3,27 +3,23 @@
 #include <iostream>
 #include <ostream>
 
-fb_renderer::fb_renderer(uint32_t fb_width, uint32_t fb_height)
+fb_renderer::fb_renderer()
 {
-    constexpr float quadVertices[] = {
-        // positions   // texCoords
-        -1.0f,  1.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f,  0.0f, 0.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-
-        -1.0f,  1.0f,  0.0f, 1.0f,
-         1.0f, -1.0f,  1.0f, 0.0f,
-         1.0f,  1.0f,  1.0f, 1.0f
-    };
-
     glGenVertexArrays(1, &vao_id_);
-    glGenBuffers(1, &vbo_id_);
-
     glBindVertexArray(vao_id_);
+
+    glGenBuffers(1, &vbo_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
+    // Quad vertices with positions and texture coordinates
+    float vertices[] = {
+        // positions  // texture coords
+        -1.0f,  1.0f,  0.0f, 1.0f, // top left
+        -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
+         1.0f,  1.0f,  1.0f, 1.0f, // top right
+         1.0f, -1.0f,  1.0f, 0.0f  // bottom right
+    };
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
     // position attribute
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
@@ -35,20 +31,70 @@ fb_renderer::fb_renderer(uint32_t fb_width, uint32_t fb_height)
     glGenTextures(1, &fb_tex_id_);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb_width, fb_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // shader bullshit
-    unsigned int vertex, fragment;
+    shader_program_ = create_shader_program();
+}
+
+fb_renderer::~fb_renderer()
+{
+    glDeleteVertexArrays(1, &vao_id_);
+    glDeleteBuffers(1, &vbo_id_);
+    glDeleteTextures(1, &fb_tex_id_);
+    glDeleteProgram(shader_program_);
+}
+
+void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
+{
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shader_program_);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, fb_data);
+
+
+    glBindVertexArray(vao_id_);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+GLuint fb_renderer::create_shader_program()
+{
+    const GLchar* vert_shader_src = R"(
+        #version 430 core
+        layout (location = 0) in vec2 aPos;
+        layout (location = 1) in vec2 aTexCoords;
+        out vec2 TexCoords;
+        void main()
+        {
+            gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);
+            TexCoords = aTexCoords;
+        }
+    )";
+
+    const GLchar* frag_shader_src = R"(
+        #version 430 core
+        in vec2 TexCoords;
+        out vec4 FragColor;
+        uniform sampler2D screenTexture;
+        void main()
+        {
+            FragColor = texture(screenTexture, TexCoords);
+        }
+    )";
+
     int success;
     char infoLog[512];
 
     // vertex shader
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vert_shader_, nullptr);
+    GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vert_shader_src, nullptr);
     glCompileShader(vertex);
     // check for shader compile errors
     glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
@@ -59,8 +105,8 @@ fb_renderer::fb_renderer(uint32_t fb_width, uint32_t fb_height)
     }
 
     // fragment shader
-    fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &frag_shader_, nullptr);
+    GLuint fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &frag_shader_src, nullptr);
     glCompileShader(fragment);
     // check for shader compile errors
     glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
@@ -84,21 +130,5 @@ fb_renderer::fb_renderer(uint32_t fb_width, uint32_t fb_height)
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-}
-
-void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
-{
-    glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (int)fb_width, (int)fb_height, GL_RGB, GL_UNSIGNED_BYTE, fb_data);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glUseProgram(shader_program_);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-
-    glBindVertexArray(vao_id_);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    return shader_program_;
 }

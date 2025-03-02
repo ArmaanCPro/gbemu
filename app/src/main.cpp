@@ -8,7 +8,7 @@
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
-#define SCREEN_MULTIPLIER 3
+#define SCREEN_MULTIPLIER 4
 
 int main(int argc, char* argv[])
 {
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     gb::cpu cpu{};
     gb::ppu ppu{};
 
-    fb_renderer renderer { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER };
+    fb_renderer renderer {};
 
     bool skip_rom_execution = false;
 
