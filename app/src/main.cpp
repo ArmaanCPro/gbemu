@@ -8,7 +8,7 @@
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
-#define SCREEN_MULTIPLIER 4
+#define SCREEN_MULTIPLIER 1
 #define WINDOW_WIDTH (SCREEN_WIDTH * SCREEN_MULTIPLIER)
 #define WINDOW_HEIGHT (SCREEN_HEIGHT * SCREEN_MULTIPLIER)
 
@@ -38,6 +38,9 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    std::array<uint32_t, 160 * 144> fb_data; // < 160 * 144>
+    fb_data.fill(0xFF0000FF);
+
     while (!win.should_close())
     {
         if (!skip_rom_execution)
@@ -53,7 +56,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        renderer.render(ppu.get_framebuffer(), SCREEN_WIDTH, SCREEN_HEIGHT);
+        renderer.render(fb_data.data(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
         win.swap_buffers();
         win.poll_events();
