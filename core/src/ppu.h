@@ -6,8 +6,6 @@
 #include <array>
 #include "memory_map.h"
 
-#include <iostream>
-
 namespace gb
 {
     class ppu;
@@ -29,24 +27,6 @@ public:
 
     void tick(uint32_t cycles, memory_map& mem);
     [[nodiscard]] const uint32_t* get_framebuffer() const { return framebuffer_; }
-
-    void debug_print_framebuffer() const {
-        int non_zero_pixels = 0;
-        uint32_t first_non_zero = 0;
-
-        for (int i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-            if (framebuffer_[i] != 0) {
-                non_zero_pixels++;
-                if (!first_non_zero) first_non_zero = framebuffer_[i];
-            }
-        }
-
-        std::cout << "Non-zero pixels: " << non_zero_pixels << "\n";
-        if (first_non_zero) {
-            std::cout << "First non-zero pixel value: 0x" << std::hex << first_non_zero << std::dec << "\n";
-        }
-    }
-
 
 private:
     static constexpr int SCREEN_WIDTH = 160;

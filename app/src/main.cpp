@@ -12,13 +12,13 @@
 
 int main(int argc, char* argv[])
 {
-    window win { SCREEN_WIDTH, SCREEN_HEIGHT, "gbemu" };
+    window win { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER, "gbemu" };
     gb::memory_map mem {};
     mem.skip_boot_rom();
     gb::cpu cpu{};
     gb::ppu ppu{};
 
-    fb_renderer renderer { SCREEN_WIDTH, SCREEN_HEIGHT };
+    fb_renderer renderer { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER };
 
     bool skip_rom_execution = false;
 
@@ -36,8 +36,6 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    uint64_t total_cycles = 0;
-
     while (!win.should_close())
     {
         if (!skip_rom_execution)
@@ -46,8 +44,6 @@ int main(int argc, char* argv[])
             {
                 const uint32_t cycles = cpu.execute(mem);
                 ppu.tick(cycles, mem);
-                ppu.debug_print_framebuffer();
-                total_cycles += cycles;
             }
             catch(const std::exception& e)
             {

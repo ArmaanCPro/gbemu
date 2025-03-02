@@ -22,24 +22,25 @@ private:
 
     const GLchar* const vert_shader_ = R"(
         #version 430 core
-        layout(location = 0) in vec2 aPos;
-        layout(location = 1) in vec2 aTexCoord;
-        out vec2 TexCoord;
+        layout (location = 0) in vec2 aPos;
+        layout (location = 1) in vec2 aTexCoords;
+        out vec2 TexCoords;
         void main()
         {
             gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);
-            TexCoord = aTexCoord;
+            TexCoords = aTexCoords;
         }
     )";
 
     const GLchar* const frag_shader_ = R"(
         #version 430 core
-        in vec2 TexCoord;
+        layout (location = 0) in vec2 aPos;
+        in vec2 TexCoords;
         out vec4 FragColor;
         uniform sampler2D screenTexture;
         void main()
         {
-            FragColor = texture(screenTexture, TexCoord);
+            FragColor = texture(screenTexture, TexCoords);
         }
     )";
 };
