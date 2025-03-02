@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ostream>
 
-fb_renderer::fb_renderer()
+fb_renderer::fb_renderer(float window_width, float window_height)
 {
     glGenVertexArrays(1, &vao_id_);
     glBindVertexArray(vao_id_);
@@ -11,13 +11,24 @@ fb_renderer::fb_renderer()
     glGenBuffers(1, &vbo_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
 
+    // calculate aspect ratios for custom scaling
+    float target_aspect = window_width / window_height;
+    float gb_aspect = 160.0f / 144.0f;
+
+    float scale_x = 1.0f, scale_y = 1.0f;
+
+    if (target_aspect > gb_aspect)
+        scale_x = target_aspect / gb_aspect;
+    else if (target_aspect < gb_aspect)
+        scale_y = gb_aspect / target_aspect;
+
     // Quad vertices with positions and texture coordinates
     float vertices[] = {
         // positions  // texture coords
-        -1.0f,  1.0f,  0.0f, 1.0f, // top left
-        -1.0f, -1.0f,  0.0f, 0.0f, // bottom left
-         1.0f,  1.0f,  1.0f, 1.0f, // top right
-         1.0f, -1.0f,  1.0f, 0.0f  // bottom right
+        -scale_x,  scale_y,  0.0f, 1.0f, // top left
+        -scale_x, -scale_y,  0.0f, 0.0f, // bottom left
+         scale_x,  scale_y,  1.0f, 1.0f, // top right
+         scale_x, -scale_y,  1.0f, 0.0f  // bottom right
     };
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
@@ -49,7 +60,6 @@ fb_renderer::~fb_renderer()
 
 void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
 {
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -58,7 +68,6 @@ void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, fb_data);
-
 
     glBindVertexArray(vao_id_);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -89,8 +98,8 @@ GLuint fb_renderer::create_shader_program()
         }
     )";
 
-    int success;
-    char infoLog[512];
+    GLint success;
+    GLchar infoLog[512];
 
     // vertex shader
     GLuint vertex = glCreateShader(GL_VERTEX_SHADER);

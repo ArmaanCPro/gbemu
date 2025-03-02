@@ -10,6 +10,26 @@ namespace glfw_callbacks
     { glViewport(0, 0, width, height); }
 }
 
+void APIENTRY glDebugOutput(GLenum source, GLenum, unsigned int id, GLenum severity,
+                           GLsizei, const char* message, const void*)
+{
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return; // Ignore notification severity messages
+
+    std::cout << "---------------" << std::endl;
+    std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+    switch (source)
+    {
+        case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
+        case GL_DEBUG_SOURCE_APPLICATION:      std::cout << "Source: Application"; break;
+        case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
+    }
+    std::cout << std::endl;
+}
+
 window::window(int scr_width, int scr_height, std::string title)
 {
     glfwInit();
@@ -19,6 +39,13 @@ window::window(int scr_width, int scr_height, std::string title)
 
 #ifdef DEBUG
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    if (GLAD_GL_VERSION_4_3)
+        {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        glDebugMessageCallback(glDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    }
 #endif
 
 #ifdef GB_APPLE
