@@ -11,12 +11,12 @@ fb_renderer::fb_renderer(float, float)
     glBindVertexArray(vao_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
 
-    //glGenBuffers(1, &fbo_id_);
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
+    // glGenBuffers(1, &fbo_id_);
+    // glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
 
     // calculate aspect ratios for custom scaling
-    //float target_aspect = window_width / window_height;
-    //float gb_aspect = 160.0f / 144.0f;
+    // float target_aspect = window_width / window_height;
+    // float gb_aspect = 160.0f / 144.0f;
 
     float scale_x = 1.0f, scale_y = 1.0f;
 
@@ -28,27 +28,27 @@ fb_renderer::fb_renderer(float, float)
     // Quad vertices with positions and texture coordinates
     float vertices[] = {
         // positions  // texture coords
-        -scale_x,  scale_y,  0.0f, 1.0f, // top left
-        -scale_x, -scale_y,  0.0f, 0.0f, // bottom left
-         scale_x, -scale_y,  1.0f, 0.0f, // bottom right
+        -scale_x, scale_y,  0.0f, 1.0f, // top left
+        -scale_x, -scale_y, 0.0f, 0.0f, // bottom left
+        scale_x,  -scale_y, 1.0f, 0.0f, // bottom right
 
-        -scale_x,  scale_y,  0.0f, 1.0f, // top left
-         scale_x, -scale_y,  1.0f, 0.0f,  // bottom right
-         scale_x,  scale_y,  1.0f, 1.0f // top right
+        -scale_x, scale_y,  0.0f, 1.0f, // top left
+        scale_x,  -scale_y, 1.0f, 0.0f, // bottom right
+        scale_x,  scale_y,  1.0f, 1.0f  // top right
     };
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float), &vertices, GL_STATIC_DRAW);
 
     // position attribute
-    glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
     // texture coord attribute
-    glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
-    glGenTextures(1, &fb_tex_id_);
     glActiveTexture(GL_TEXTURE0);
+    glGenTextures(1, &fb_tex_id_);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -65,29 +65,24 @@ fb_renderer::~fb_renderer()
     glDeleteProgram(shader_program_);
 }
 
-void fb_renderer::render(const uint32_t*, uint32_t fb_width, uint32_t fb_height)
+void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    //glUseProgram(0);
+    // glUseProgram(0);
     glUseProgram(shader_program_);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    uint32_t test_data[160 * 144];
-    for (int i = 0; i < 160 * 144; i++)
-    {
-        test_data[i] = 0xFF0000FF;
-    }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, test_data);
-    glUniform1i(glGetUniformLocation(shader_program_, "u_Texture"), 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb_data);
+    // glUniform1i(glGetUniformLocation(shader_program_, "u_Texture"), 0);
 
     glBindVertexArray(vao_id_);
-    //glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
-    //glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_tex_id_, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    //glBlitFramebuffer(0, 0, fb_width, fb_height, 0, 0, fb_width, fb_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    // glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
+    // glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_tex_id_, 0);
+    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    // glBlitFramebuffer(0, 0, fb_width, fb_height, 0, 0, fb_width, fb_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 }
 
@@ -109,11 +104,11 @@ GLuint fb_renderer::create_shader_program()
         #version 330 core
         out vec4 FragColor;
         in vec2 TexCoords;
-        //uniform sampler2D screenTexture;
-        uniform sampler2D u_Texture;
+        uniform sampler2D screenTexture;
+        //uniform sampler2D u_Texture;
         void main()
         {
-            FragColor = texture(u_Texture, TexCoords);
+            FragColor = texture(screenTexture, TexCoords);
         }
     )";
 

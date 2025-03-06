@@ -72,8 +72,6 @@ window::window(int scr_width, int scr_height, std::string title)
         exit(-1);
     }
     glViewport(0, 0, scr_width, scr_height);
-
-    glEnable(GL_DEPTH_TEST);
 }
 
 window::~window()
