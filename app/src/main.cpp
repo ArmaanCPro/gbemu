@@ -38,9 +38,6 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    std::array<uint32_t, 160 * 144> fb_data; // < 160 * 144>
-    fb_data.fill(0xFFFFFFFF);
-
     while (!win.should_close())
     {
         if (!skip_rom_execution)
@@ -56,7 +53,7 @@ int main(int argc, char* argv[])
             }
         }
 
-        renderer.render(fb_data.data(), 160, 144);
+        renderer.render(ppu.get_framebuffer(), SCREEN_WIDTH, SCREEN_HEIGHT);
 
         win.swap_buffers();
         win.poll_events();
