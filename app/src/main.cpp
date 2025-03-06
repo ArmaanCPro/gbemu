@@ -8,7 +8,7 @@
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
-#define SCREEN_MULTIPLIER 1
+#define SCREEN_MULTIPLIER 3
 #define WINDOW_WIDTH (SCREEN_WIDTH * SCREEN_MULTIPLIER)
 #define WINDOW_HEIGHT (SCREEN_HEIGHT * SCREEN_MULTIPLIER)
 
@@ -28,14 +28,14 @@ int main(int argc, char* argv[])
     {
         mem.load_rom(std::filesystem::absolute(argv[1]));
     }
-    else if (argc == 2 && strcmp(argv[1], "--skip-rom") == 0)
+    else if (argc == 2 && !std::filesystem::exists(argv[1]))
     {
-        skip_rom_execution = true;
+        std::cout << "Usage: app.exe <rom absolute path>" << std::endl;
+        return -1;
     }
     else
     {
-        std::cerr << "Usage: app.exe <rom absolute path>" << std::endl;
-        return -1;
+        std::cout << "Skipping rom loading" << std::endl;
     }
 
     while (!win.should_close())
