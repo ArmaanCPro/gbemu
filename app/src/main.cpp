@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
 {
     window win { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER, "gbemu" };
     gb::memory_map mem {};
-    mem.skip_boot_rom();
+    //mem.skip_boot_rom();
     gb::cpu cpu{};
     gb::ppu ppu{};
 
