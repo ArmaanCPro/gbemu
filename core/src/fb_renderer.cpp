@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ostream>
 
-fb_renderer::fb_renderer(float, float)
+fb_renderer::fb_renderer()
 {
     glGenVertexArrays(1, &vao_id_);
     glGenBuffers(1, &vbo_id_);
@@ -11,19 +11,7 @@ fb_renderer::fb_renderer(float, float)
     glBindVertexArray(vao_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
 
-    // glGenBuffers(1, &fbo_id_);
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
-
-    // calculate aspect ratios for custom scaling
-    // float target_aspect = window_width / window_height;
-    // float gb_aspect = 160.0f / 144.0f;
-
     float scale_x = 1.0f, scale_y = 1.0f;
-
-    /*if (target_aspect > gb_aspect)
-        scale_x = target_aspect / gb_aspect;
-    else if (target_aspect < gb_aspect)
-        scale_y = gb_aspect / target_aspect;*/
 
     // Quad vertices with positions and texture coordinates
     float vertices[] = {
@@ -48,9 +36,10 @@ fb_renderer::fb_renderer(float, float)
     glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &fb_tex_id_);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, window_width, window_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    // texture wrapping
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // texture filtering
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -70,26 +59,20 @@ void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // glUseProgram(0);
     glUseProgram(shader_program_);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb_data);
-    // glUniform1i(glGetUniformLocation(shader_program_, "u_Texture"), 0);
 
     glBindVertexArray(vao_id_);
-    // glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo_id_);
-    // glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_tex_id_, 0);
-    // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    // glBlitFramebuffer(0, 0, fb_width, fb_height, 0, 0, fb_width, fb_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
 }
 
 GLuint fb_renderer::create_shader_program()
 {
     const GLchar* vert_shader_src = R"(
-        #version 330 core
+        #version 430 core
         layout (location = 0) in vec2 aPos;
         layout (location = 1) in vec2 aTexCoords;
         out vec2 TexCoords;
@@ -101,11 +84,10 @@ GLuint fb_renderer::create_shader_program()
     )";
 
     const GLchar* frag_shader_src = R"(
-        #version 330 core
+        #version 430 core
         out vec4 FragColor;
         in vec2 TexCoords;
         uniform sampler2D screenTexture;
-        //uniform sampler2D u_Texture;
         void main()
         {
             FragColor = texture(screenTexture, TexCoords);

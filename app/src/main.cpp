@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
     gb::cpu cpu{};
     gb::ppu ppu{};
 
-    fb_renderer renderer {(float)WINDOW_WIDTH, (float)WINDOW_HEIGHT};
+    fb_renderer renderer {};
 
     bool skip_rom_execution = false;
 
