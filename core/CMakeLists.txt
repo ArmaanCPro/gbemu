@@ -17,8 +17,6 @@ set  (SOURCES
         "resources/dmg_opcodes.h"
         "src/ppu.h"
         "src/ppu.cpp"
-        "src/fb_renderer.h"
-        "src/fb_renderer.cpp"
 )
 
 source_group("src" FILES ${SOURCES})

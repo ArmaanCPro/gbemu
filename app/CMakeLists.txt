@@ -13,6 +13,8 @@ set  (SOURCES
         "src/main.cpp"
         "src/window.h"
         "src/window.cpp"
+        "src/fb_renderer.h"
+        "src/fb_renderer.cpp"
 )
 
 add_executable( app ${SOURCES} )
