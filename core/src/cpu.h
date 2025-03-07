@@ -11,10 +11,10 @@ namespace gb
 
     enum flag_types : uint8_t
     {
-        FLAG_Z = 0x80,
-        FLAG_N = 0x40,
-        FLAG_H = 0x20,
-        FLAG_C = 0x10
+        FLAG_Z = 0x80,  // zero
+        FLAG_N = 0x40,  // subtract
+        FLAG_H = 0x20,  // half-carry
+        FLAG_C = 0x10   // carry
     };
 }
 
@@ -100,6 +100,8 @@ struct gb::cpu
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);
     uint32_t inc_a(memory_map&);
+    uint32_t inc_b(memory_map&);
+    uint32_t inc_c(memory_map&);
     uint32_t inc_hl_mem(memory_map& mem);
     uint32_t inc_hl(memory_map&);
     uint32_t dec_a(memory_map&);

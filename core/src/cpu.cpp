@@ -55,6 +55,8 @@ void gb::cpu::init_instruction_table()
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
     instruction_table[INC_A] = &cpu::inc_a;
+    instruction_table[INC_B] = &cpu::inc_b;
+    instruction_table[INC_C] = &cpu::inc_c;
     instruction_table[INC_HL] = &cpu::inc_hl;
     instruction_table[INC_HL_MEM] = &cpu::inc_hl_mem;
     instruction_table[DEC_A] = &cpu::dec_a;
@@ -192,8 +194,32 @@ uint32_t gb::cpu::pop_bc(memory_map& mem)
 
 uint32_t gb::cpu::inc_a(memory_map&)
 {
+    bool half_carry = (AF.high & 0x0F) == 0x0F;
     AF.high++;
-    return 2;
+    AF.low &= FLAG_C; // preserve carry flag and clear
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_H, half_carry);
+    return 1;
+}
+
+uint32_t gb::cpu::inc_b(memory_map&)
+{
+    bool half_carry = (BC.high & 0x0F) == 0x0F;
+    BC.high++;
+    BC.low &= FLAG_C; // preserve carry flag and clear
+    set_flag(FLAG_Z, BC.high == 0);
+    set_flag(FLAG_H, half_carry);
+    return 1;
+}
+
+uint32_t gb::cpu::inc_c(memory_map&)
+{
+    bool half_carry = (BC.low & 0x0F) == 0x0F;
+    BC.low++;
+    BC.low &= FLAG_C; // preserve carry flag and clear
+    set_flag(FLAG_Z, BC.low == 0);
+    set_flag(FLAG_H, half_carry);
+    return 1;
 }
 
 uint32_t gb::cpu::inc_hl_mem(memory_map& mem)

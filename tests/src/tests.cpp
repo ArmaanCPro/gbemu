@@ -276,7 +276,7 @@ TEST_F(CpuTests1, A_Register_Arithmetic_OperationsWork)
         const auto cycles = cpu.execute(mem);
 
         // then:
-        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cycles, 1);
         EXPECT_EQ(cpu.AF.high, 0x06);
         EXPECT_EQ(cpu.AF.low, 0x0);
     }
