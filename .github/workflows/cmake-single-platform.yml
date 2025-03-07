@@ -6,8 +6,16 @@ name: CMake on a single platform
 on:
   push:
     branches: [ "master" ]
+    paths-ignore:
+      - 'app/**'
+      - '**.md'
+      - 'docs/**'
   pull_request:
     branches: [ "master" ]
+    paths-ignore:
+      - 'app/**'
+      - '**.md'
+      - 'docs/**'
 
 env:
   BUILD_TYPE: Release
@@ -23,15 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Cache apt packages
-      - name: Cache apt packages
-        uses: actions/cache@v3
-        with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cmake.yml') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
-
       # Install required dependencies including Ninja
       - name: Install Dependencies
         run: |
@@ -45,41 +44,14 @@ jobs:
             ninja-build \
             ccache
 
-      # Set up ccache
-      - name: Create ccache directory
-        run: mkdir -p ~/.ccache
-
-      - name: Cache ccache output
-        uses: actions/cache@v3
+      # Set up ccache - this is the most important cache for speed
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
         with:
-          path: ~/.ccache
-          key: ${{ runner.os }}-ccache-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-ccache-
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/*.cpp', '**/*.h', '**/*.hpp') }}
+          max-size: 1G  # Reduced to save space
 
-      - name: Configure ccache
-        run: |
-          ccache --max-size=2G
-          ccache --set-config=compression=true
-          echo 'export PATH="/usr/lib/ccache:$PATH"' >> ~/.bashrc
-          source ~/.bashrc
-
-      # Ensure vcpkg directories exist
-      - name: Ensure vcpkg directories exist
-        run: |
-          mkdir -p ~/.cache/vcpkg/archives
-          mkdir -p ${{ github.workspace }}/build/vcpkg_installed
-
-      # Cache vcpkg downloads
-      - name: Cache vcpkg archives
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/vcpkg/archives
-          key: ${{ runner.os }}-vcpkg-archives-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-archives-
-
-      # Cache vcpkg installed packages
+      # Cache vcpkg packages
       - name: Cache vcpkg installed
         uses: actions/cache@v3
         with:
@@ -88,37 +60,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-vcpkg-installed-
 
-      # Cache CMake build directory (excluding vcpkg_installed which is cached separately)
-      - name: Cache CMake build
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/build
-            !${{ github.workspace }}/build/vcpkg_installed
-          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
-          restore-keys: |
-            ${{ runner.os }}-cmake-
-
-      - name: ccache statistics before build
-        run: ccache -s
-
       - name: Configure CMake
         run: >
           cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build 
           -G "${{ env.generator }}"
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          -DCMAKE_C_COMPILER=${{ env.c_compiler }}
+          -DCMAKE_CXX_COMPILER=${{ env.cpp_compiler }}
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
           -DCMAKE_C_COMPILER_LAUNCHER=ccache
-          -DCMAKE_CXX_COMPILER=${{ env.cpp_compiler }} 
-          -DCMAKE_C_COMPILER=${{ env.c_compiler }}
-          -S ${{ github.workspace }}
+          -DVCPKG_FEATURE_FLAGS=binarycaching
 
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-
-      - name: ccache statistics after build
-        run: ccache -s
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel $(nproc)
 
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ctest -C ${{env.BUILD_TYPE}}
+        run: ctest -C ${{env.BUILD_TYPE}} --parallel $(nproc) --output-on-failure
