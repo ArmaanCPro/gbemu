@@ -17,8 +17,6 @@ set  (SOURCES
         "resources/dmg_opcodes.h"
         "src/ppu.h"
         "src/ppu.cpp"
-        "src/window.h"
-        "src/window.cpp"
         "src/fb_renderer.h"
         "src/fb_renderer.cpp"
 )
@@ -30,7 +28,3 @@ add_library( core ${SOURCES} )
 
 target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/src" )
 target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/resources" )
-
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-target_link_libraries(core PUBLIC glfw glad::glad)

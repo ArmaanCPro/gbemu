@@ -11,8 +11,14 @@ endif()
 
 set  (SOURCES
         "src/main.cpp"
+        "src/window.h"
+        "src/window.cpp"
 )
 
 add_executable( app ${SOURCES} )
 add_dependencies( app core )
 target_link_libraries( app core )
+
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+target_link_libraries(core PUBLIC glfw glad::glad)
