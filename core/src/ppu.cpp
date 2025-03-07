@@ -102,7 +102,8 @@ void gb::ppu::render_window(memory_map& mem, int scanline)
 
     for (int x = 0; x < SCREEN_WIDTH - wx + 7; x++)
     {
-        if (x + wx < 7) continue;
+        if (x + wx < 7)
+            continue;
 
         const uint8_t tile_col = (uint8_t)(x / 8);
         const uint16_t tile_addr = tile_map + tile_row * 32 + tile_col;
@@ -131,7 +132,8 @@ void gb::ppu::render_sprites(memory_map& mem, int scanline)
     const bool tall_sprites = lcdc & 0x04;
     const int sprite_height = tall_sprites ? 16 : 8;
 
-    struct sprite {
+    struct sprite
+    {
         uint8_t y;
         uint8_t x;
         uint8_t tile;
@@ -179,7 +181,7 @@ void gb::ppu::render_sprites(memory_map& mem, int scanline)
             const int bit = flip_x ? x : 7 - x;
             const uint8_t color_id = ((byte1 >> bit) & 1) | (((byte2 >> bit) & 1) << 1);
 
-            if (color_id == 0)  // Transparent pixel
+            if (color_id == 0) // Transparent pixel
                 continue;
 
             framebuffer_[scanline * SCREEN_WIDTH + sprite.x + x] = get_color(color_id, palette);
@@ -189,41 +191,41 @@ void gb::ppu::render_sprites(memory_map& mem, int scanline)
 
 void gb::ppu::update_mode(memory_map& mem)
 {
-    uint8_t stat = mem.read(STAT_ADDR) & 0xFC;  // Clear mode bits
+    uint8_t stat = mem.read(STAT_ADDR) & 0xFC; // Clear mode bits
 
     switch (mode_)
     {
         case ppu_mode::OAM:
             stat |= 0x02;
-        if (cyclecounter_ >= CYCLES_OAM)
-        {
-            mode_ = ppu_mode::Drawing;
-            stat |= 0x03;
-        }
-        break;
+            if (cyclecounter_ >= CYCLES_OAM)
+            {
+                mode_ = ppu_mode::Drawing;
+                stat |= 0x03;
+            }
+            break;
 
         case ppu_mode::Drawing:
             stat |= 0x03;
-        if (cyclecounter_ >= CYCLES_OAM + CYCLES_DRAWING)
-        {
-            mode_ = ppu_mode::HBlank;
-            stat |= 0x00;
-        }
-        break;
+            if (cyclecounter_ >= CYCLES_OAM + CYCLES_DRAWING)
+            {
+                mode_ = ppu_mode::HBlank;
+                stat |= 0x00;
+            }
+            break;
 
         case ppu_mode::HBlank:
             stat |= 0x00;
-        break;
+            break;
 
         case ppu_mode::VBlank:
             stat |= 0x01;
-        if (currentline_ >= TOTAL_LINES)
-        {
-            mode_ = ppu_mode::OAM;
-            stat |= 0x02;
-            currentline_ = 0;
-        }
-        break;
+            if (currentline_ >= TOTAL_LINES)
+            {
+                mode_ = ppu_mode::OAM;
+                stat |= 0x02;
+                currentline_ = 0;
+            }
+            break;
     }
 
     // LYC comparison
@@ -231,7 +233,7 @@ void gb::ppu::update_mode(memory_map& mem)
     {
         stat |= 0x04;
         //if (stat & 0x40)
-            //mem.request_interrupt(0x02);  // STAT interrupt
+        //mem.request_interrupt(0x02);  // STAT interrupt
     }
 
     mem.write(STAT_ADDR, stat);
@@ -243,10 +245,15 @@ uint32_t gb::ppu::get_color(uint8_t color_id, uint8_t palette) const
 
     switch (shade)
     {
-        case 0: return 0xFFFFFFFF;  // White
-        case 1: return 0xFFAAAAAA;  // Light gray
-        case 2: return 0xFF555555;  // Dark gray
-        case 3: return 0xFF000000;  // Black
-        default: return 0xFFFFFFFF;
+        case 0:
+            return 0xFFFFFFFF; // White
+        case 1:
+            return 0xFFAAAAAA; // Light gray
+        case 2:
+            return 0xFF555555; // Dark gray
+        case 3:
+            return 0xFF000000; // Black
+        default:
+            return 0xFFFFFFFF;
     }
 }

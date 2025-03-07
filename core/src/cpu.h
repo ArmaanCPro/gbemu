@@ -11,10 +11,10 @@ namespace gb
 
     enum flag_types : uint8_t
     {
-        FLAG_Z = 0x80,  // zero
-        FLAG_N = 0x40,  // subtract
-        FLAG_H = 0x20,  // half-carry
-        FLAG_C = 0x10   // carry
+        FLAG_Z = 0x80, // zero
+        FLAG_N = 0x40, // subtract
+        FLAG_H = 0x20, // half-carry
+        FLAG_C = 0x10 // carry
     };
 }
 
@@ -34,11 +34,12 @@ struct gb::cpu
         init_instruction_table();
         power_up_sequence();
     }
-    
+
     // allows viewing a register as both a 16 bit and 2 8 bit values
     union Register16
     {
         uint16_t full;
+
         struct
         {
             uint8_t low;

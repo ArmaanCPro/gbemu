@@ -21,3 +21,5 @@ IndentCaseLabels: true
 
 PointerAlignment: Left
 ReferenceAlignment: Left
+
+SpaceBeforeCpp11BracedList: true

@@ -89,21 +89,19 @@
     }
   ],
 
-    "buildPresets": [
-        {
-            "name": "app-debug",
-            "displayName": "Debug Build",
-            "configurePreset": "debug-default",
-            "configuration": "Debug",
-            "targets": [ "app" ]
-        },
-        {
-            "name": "app-release",
-            "displayName": "Release Build",
-            "configurePreset": "release-default",
-            "configuration": "Release",
-            "targets": [ "app" ]
-        }
-    ]
+  "buildPresets": [
+    {
+      "name": "app-debug",
+      "displayName": "Debug App Build",
+      "targets": [ "app" ],
+      "configuration": "Debug"
+    },
+    {
+      "name": "app-release",
+      "displayName": "Release App Build",
+      "targets": [ "app" ],
+      "configuration": "Release"
+    }
+  ]
 
 }

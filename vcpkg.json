@@ -1,8 +1,7 @@
 {
   "name": "gbemu",
   "version": "0.1.0",
-  "builtin-baseline": "11be7f536538ace43f867c8efb3d624c43b6af54",
-
+  "builtin-baseline": "ea766c450a1b1fac8e8ee2085ed5ddbf638ed0fa",
   "features": {
     "app": {
       "description": "Build the graphical application",
@@ -17,6 +16,5 @@
       ]
     }
   },
-
   "dependencies": []
 }

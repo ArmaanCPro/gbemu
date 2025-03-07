@@ -9,10 +9,10 @@ namespace gb
 
 enum class ppu_mode
 {
-    HBlank,     // H-Blank period
-    VBlank,     // V-Blank period
-    OAM,        // Search OAM for sprites on current scanline
-    Drawing     // Pixel transfer
+    HBlank, // H-Blank period
+    VBlank, // V-Blank period
+    OAM, // Search OAM for sprites on current scanline
+    Drawing // Pixel transfer
 };
 
 class gb::ppu
@@ -22,7 +22,11 @@ public:
     ~ppu() = default;
 
     void tick(uint32_t cycles, memory_map& mem);
-    [[nodiscard]] const uint32_t* get_framebuffer() const { return framebuffer_; }
+
+    [[nodiscard]] const uint32_t* get_framebuffer() const
+    {
+        return framebuffer_;
+    }
 
 private:
     static constexpr int SCREEN_WIDTH = 160;
@@ -48,8 +52,8 @@ private:
 
     uint32_t cyclecounter_ {0};
     uint8_t currentline_ {0};
-    ppu_mode mode_ { ppu_mode::OAM };
-    uint32_t framebuffer_[SCREEN_WIDTH * SCREEN_HEIGHT] {};
+    ppu_mode mode_ {ppu_mode::OAM};
+    uint32_t framebuffer_[SCREEN_WIDTH * SCREEN_HEIGHT]{};
 
     void render_scanline(memory_map& mem);
     void render_background(memory_map& mem, int scanline);
@@ -58,8 +62,24 @@ private:
     void update_mode(memory_map& mem);
 
     [[nodiscard]] uint32_t get_color(uint8_t color_id, uint8_t palette) const;
-    [[nodiscard]] bool is_lcd_enabled(uint8_t lcdc) const { return lcdc & 0x80; }
-    [[nodiscard]] bool is_window_enabled(uint8_t lcdc) const { return lcdc & 0x20; }
-    [[nodiscard]] bool is_sprites_enabled(uint8_t lcdc) const { return lcdc & 0x02; }
-    [[nodiscard]] bool is_bg_enabled(uint8_t lcdc) const { return lcdc & 0x01; }
+
+    [[nodiscard]] bool is_lcd_enabled(uint8_t lcdc) const
+    {
+        return lcdc & 0x80;
+    }
+
+    [[nodiscard]] bool is_window_enabled(uint8_t lcdc) const
+    {
+        return lcdc & 0x20;
+    }
+
+    [[nodiscard]] bool is_sprites_enabled(uint8_t lcdc) const
+    {
+        return lcdc & 0x02;
+    }
+
+    [[nodiscard]] bool is_bg_enabled(uint8_t lcdc) const
+    {
+        return lcdc & 0x01;
+    }
 };

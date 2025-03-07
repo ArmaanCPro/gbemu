@@ -40,12 +40,12 @@
 // special registers
 #define BOOT_ROM_DISABLE_REGISTER 0xFF50
 
-namespace gb 
+namespace gb
 {
     class memory_map;
 }
 
-class gb::memory_map 
+class gb::memory_map
 {
 public:
     memory_map()
@@ -56,7 +56,7 @@ public:
           io(std::array<uint8_t, IO_SIZE>{}),
           hram(std::array<uint8_t, HRAM_SIZE>{}),
           ie_register(0),
-          current_rom_bank(1),    // Bank 0 is fixed, so we start with bank 1
+          current_rom_bank(1), // Bank 0 is fixed, so we start with bank 1
           current_ram_bank(0),
           ram_enabled(false),
           boot_rom_enabled(true)
@@ -155,7 +155,7 @@ public:
         }
         else if (address >= IO_START && address <= IO_END)
         {
-            if (address == 0xFF50)  // Boot ROM disable register
+            if (address == 0xFF50) // Boot ROM disable register
             {
                 if (value == 0x01)
                 {
@@ -214,7 +214,7 @@ public:
 
 private:
     // ROM banks
-    std::array<uint8_t, ROM_BANK_SIZE> rom_bank0;              // Fixed bank 0
+    std::array<uint8_t, ROM_BANK_SIZE> rom_bank0; // Fixed bank 0
     std::vector<std::array<uint8_t, ROM_BANK_SIZE>> rom_banks; // Switchable banks
 
     // RAM regions
@@ -247,7 +247,8 @@ private:
         {
             // ROM Bank Number (low 5 bits)
             value &= 0x1F;
-            if (value == 0) value = 1;  // Bank 0 is not allowed here
+            if (value == 0)
+                value = 1; // Bank 0 is not allowed here
             current_rom_bank = (current_rom_bank & 0x60) | value;
         }
         else if (address <= 0x5FFF)
@@ -265,10 +266,18 @@ private:
         size_t num_ram_banks = 0;
         switch (ram_size)
         {
-            case 0x02: num_ram_banks = 1; break;  // 8KB
-            case 0x03: num_ram_banks = 4; break;  // 32KB
-            case 0x04: num_ram_banks = 16; break; // 128KB
-            case 0x05: num_ram_banks = 8; break;  // 64KB
+            case 0x02:
+                num_ram_banks = 1;
+                break; // 8KB
+            case 0x03:
+                num_ram_banks = 4;
+                break; // 32KB
+            case 0x04:
+                num_ram_banks = 16;
+                break; // 128KB
+            case 0x05:
+                num_ram_banks = 8;
+                break; // 64KB
         }
 
         if (num_ram_banks > 0)

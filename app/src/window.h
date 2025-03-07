@@ -13,9 +13,21 @@ public:
     window(const window&) = delete;
     window& operator=(const window&) = delete;
 
-    [[nodiscard]] bool should_close() const { return glfwWindowShouldClose(window_); }
-    void swap_buffers() const { glfwSwapBuffers(window_); }
-    void poll_events() { glfwPollEvents(); }
+    [[nodiscard]] bool should_close() const
+    {
+        return glfwWindowShouldClose(window_);
+    }
+
+    void swap_buffers() const
+    {
+        glfwSwapBuffers(window_);
+    }
+
+    void poll_events()
+    {
+        glfwPollEvents();
+    }
+
 private:
     GLFWwindow* window_ = nullptr;
 };

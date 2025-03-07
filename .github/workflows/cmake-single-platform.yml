@@ -31,7 +31,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install required dependencies including Ninja
       - name: Install Dependencies
         run: |
           sudo apt-get update

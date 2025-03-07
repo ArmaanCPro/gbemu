@@ -1,20 +1,23 @@
 #include "window.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <iostream>
 #include <sstream>
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 namespace glfw_callbacks
 {
     static void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, int width, int height)
-    { glViewport(0, 0, width, height); }
+    {
+        glViewport(0, 0, width, height);
+    }
 }
 
 void APIENTRY glDebugOutput(GLenum source, GLenum, unsigned int id, GLenum severity,
-                           GLsizei, const char* message, const void*)
+                            GLsizei, const char* message, const void*)
 {
-    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return; // Ignore notification severity messages
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+        return; // Ignore notification severity messages
 
     std::stringstream outputstream;
     outputstream << "---------------\n";
@@ -22,12 +25,26 @@ void APIENTRY glDebugOutput(GLenum source, GLenum, unsigned int id, GLenum sever
 
     switch (source)
     {
-        case GL_DEBUG_SOURCE_API:             outputstream << "Source: API"; break;
-        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   outputstream << "Source: Window System"; break;
-        case GL_DEBUG_SOURCE_SHADER_COMPILER: outputstream << "Source: Shader Compiler"; break;
-        case GL_DEBUG_SOURCE_THIRD_PARTY:     outputstream << "Source: Third Party"; break;
-        case GL_DEBUG_SOURCE_APPLICATION:     outputstream << "Source: Application"; break;
-        case GL_DEBUG_SOURCE_OTHER:           outputstream << "Source: Other"; break;
+        case GL_DEBUG_SOURCE_API:
+            outputstream << "Source: API";
+            break;
+        case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+            outputstream << "Source: Window System";
+            break;
+        case GL_DEBUG_SOURCE_SHADER_COMPILER:
+            outputstream << "Source: Shader Compiler";
+            break;
+        case GL_DEBUG_SOURCE_THIRD_PARTY:
+            outputstream << "Source: Third Party";
+            break;
+        case GL_DEBUG_SOURCE_APPLICATION:
+            outputstream << "Source: Application";
+            break;
+        case GL_DEBUG_SOURCE_OTHER:
+            outputstream << "Source: Other";
+            break;
+        default:
+            outputstream << "Source: Unknown";
     }
     std::cout << outputstream.str() << std::endl;
 }

@@ -11,7 +11,7 @@ fb_renderer::fb_renderer()
     glBindVertexArray(vao_id_);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id_);
 
-    float scale_x = 1.0f, scale_y = 1.0f;
+    constexpr float scale_x = 1.0f, scale_y = 1.0f;
 
     // Quad vertices with positions and texture coordinates
     float vertices[] = {

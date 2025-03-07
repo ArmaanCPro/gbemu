@@ -1,8 +1,8 @@
 #include "cpu.h"
 
-#include <iostream>
-#include <filesystem>
 #include "../resources/dmg_opcodes.h"
+#include <filesystem>
+#include <iostream>
 
 uint32_t gb::cpu::execute(memory_map& mem)
 {
@@ -146,7 +146,7 @@ uint32_t gb::cpu::jp_nn(memory_map& mem)
 uint32_t gb::cpu::jr_nz_n(memory_map& mem)
 {
     const int8_t offset = static_cast<int8_t>(mem.read(PC++));
-    if (!(AF.low & 0x40))  // Check Zero flag (bit 6)
+    if (!(AF.low & 0x40)) // Check Zero flag (bit 6)
     {
         PC += offset;
         return 3;
@@ -161,8 +161,8 @@ uint32_t gb::cpu::call_nn(memory_map& mem)
 
     // Push current PC onto stack (SP decrements by 2)
     SP -= 2;
-    mem.write(SP + 1, (PC >> 8) & 0xFF);    // Write high byte
-    mem.write(SP, PC & 0xFF);               // Write low byte
+    mem.write(SP + 1, (PC >> 8) & 0xFF); // Write high byte
+    mem.write(SP, PC & 0xFF); // Write low byte
 
     // Jump to target address
     PC = target_addr;
@@ -173,7 +173,7 @@ uint32_t gb::cpu::call_nn(memory_map& mem)
 uint32_t gb::cpu::ret(memory_map& mem)
 {
     // Pop PC from stack (SP increments by 2)
-    PC =  mem.read(SP) | (mem.read(SP + 1) << 8);
+    PC = mem.read(SP) | (mem.read(SP + 1) << 8);
     SP += 2;
     return 4;
 }

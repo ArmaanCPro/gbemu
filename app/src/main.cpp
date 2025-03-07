@@ -1,10 +1,10 @@
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
 #include "cpu.h"
 #include "fb_renderer.h"
-#include "window.h"
 #include "ppu.h"
+#include "window.h"
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
@@ -14,13 +14,13 @@
 
 int main(int argc, char* argv[])
 {
-    window win { SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER, "gbemu" };
-    gb::memory_map mem {};
+    window win{SCREEN_WIDTH * SCREEN_MULTIPLIER, SCREEN_HEIGHT * SCREEN_MULTIPLIER, "gbemu"};
+    gb::memory_map mem{};
     //mem.skip_boot_rom();
     gb::cpu cpu{};
     gb::ppu ppu{};
 
-    fb_renderer renderer {};
+    fb_renderer renderer{};
 
     bool skip_rom_execution = false;
 
@@ -35,6 +35,7 @@ int main(int argc, char* argv[])
     }
     else
     {
+        skip_rom_execution = true;
         std::cout << "Skipping rom loading" << std::endl;
     }
 
@@ -47,7 +48,7 @@ int main(int argc, char* argv[])
                 const uint32_t cycles = cpu.execute(mem);
                 ppu.tick(cycles, mem);
             }
-            catch(const std::exception& e)
+            catch (const std::exception& e)
             {
                 std::cerr << e.what() << '\n';
             }
