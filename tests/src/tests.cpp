@@ -2,6 +2,7 @@
 
 #include <cpu.h>
 #include <memory_map.h>
+#include <dmg_opcodes.h>
 #include <cstdint>
 
 class CpuTests1 : public ::testing::Test

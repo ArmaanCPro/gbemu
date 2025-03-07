@@ -29,6 +29,7 @@ source_group("src" FILES ${SOURCES})
 add_library( core ${SOURCES} )
 
 target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/src" )
+target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/resources" )
 
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
