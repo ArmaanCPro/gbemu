@@ -41,6 +41,8 @@ void gb::cpu::init_instruction_table()
 
     instruction_table[DEC_SP] = &cpu::dec_sp;
 
+    instruction_table[ADC_A_A] = &cpu::adc_a_a;
+    instruction_table[ADC_A_B] = &cpu::adc_a_b;
     instruction_table[LD_SP_NN] = &cpu::ld_sp_nn;
     instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
     instruction_table[LD_HL_NN] = &cpu::ld_hl_nn;
@@ -78,6 +80,32 @@ uint32_t gb::cpu::invalid_opcode(memory_map&)
 
 uint32_t gb::cpu::nop(memory_map&)
 {
+    return 1;
+}
+
+uint32_t gb::cpu::adc_a_a(memory_map&)
+{
+    const uint8_t orig_value = AF.high;
+    const uint16_t result = orig_value + orig_value + get_flag(FLAG_C);
+    AF.full = result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((orig_value & 0x0F) + (orig_value & 0x0F) + get_flag(FLAG_C)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 1;
+}
+
+uint32_t gb::cpu::adc_a_b(memory_map&)
+{
+    const uint8_t to_add = BC.high;
+    const uint16_t result = to_add + to_add + get_flag(FLAG_C);
+    AF.full = result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((to_add & 0x0F) + (to_add & 0x0F) + get_flag(FLAG_C)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
     return 1;
 }
 

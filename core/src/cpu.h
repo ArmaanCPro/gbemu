@@ -70,6 +70,11 @@ struct gb::cpu
 
     void init_instruction_table();
 
+    [[nodiscard]] bool get_flag(flag_types flag) const
+    {
+        return AF.full & flag;
+    }
+
     bool set_flag(flag_types flag, bool value)
     {
         if (value)
@@ -85,6 +90,8 @@ struct gb::cpu
 
     uint32_t invalid_opcode(memory_map&);
     uint32_t nop(memory_map&);
+    uint32_t adc_a_a(memory_map&);
+    uint32_t adc_a_b(memory_map&);
     uint32_t dec_sp(memory_map&);
     uint32_t ld_sp_nn(memory_map& mem);
     uint32_t ld_bc_nn(memory_map& mem);

@@ -11,7 +11,7 @@ public:
     ~fb_renderer();
 
     // note that this doesn't take scaled parameters, it takes the exact frame_buffer dimensions
-    void render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height);
+    void render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height) const;
 
 private:
     // stores the texture id for the framebuffer

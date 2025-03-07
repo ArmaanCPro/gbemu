@@ -6,6 +6,7 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 
 // Memory sizes
 #define ROM_BANK_SIZE (0x4000)    // 16 KB per bank
@@ -278,6 +279,8 @@ private:
             case 0x05:
                 num_ram_banks = 8;
                 break; // 64KB
+            default:
+                std::cerr << "Unsupported RAM size: " << ram_size << std::endl;
         }
 
         if (num_ram_banks > 0)

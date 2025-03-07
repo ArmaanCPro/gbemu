@@ -54,7 +54,7 @@ fb_renderer::~fb_renderer()
     glDeleteProgram(shader_program_);
 }
 
-void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height)
+void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb_height) const
 {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -63,7 +63,7 @@ void fb_renderer::render(const uint32_t* fb_data, uint32_t fb_width, uint32_t fb
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fb_tex_id_);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb_data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (int)fb_width, (int)fb_height, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, fb_data);
 
     glBindVertexArray(vao_id_);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
@@ -121,19 +121,19 @@ GLuint fb_renderer::create_shader_program()
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    shader_program_ = glCreateProgram();
-    glAttachShader(shader_program_, vertex);
-    glAttachShader(shader_program_, fragment);
-    glLinkProgram(shader_program_);
+    GLuint shader_program = glCreateProgram();
+    glAttachShader(shader_program, vertex);
+    glAttachShader(shader_program, fragment);
+    glLinkProgram(shader_program);
     // check for linking errors
-    glGetProgramiv(shader_program_, GL_LINK_STATUS, &success);
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
     if (!success)
     {
-        glGetProgramInfoLog(shader_program_, 512, nullptr, infoLog);
+        glGetProgramInfoLog(shader_program, 512, nullptr, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
 
     glDeleteShader(vertex);
     glDeleteShader(fragment);
-    return shader_program_;
+    return shader_program;
 }
