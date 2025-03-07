@@ -1,7 +1,7 @@
 #include "window.h"
 
-#include <../../build/debug-mingw/vcpkg_installed/x64-mingw-static/include/glad/glad.h>
-#include <../../build/debug-mingw/vcpkg_installed/x64-mingw-static/include/GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <sstream>
 

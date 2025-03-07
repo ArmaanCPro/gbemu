@@ -36,6 +36,9 @@ set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE 
 
 # for CI, build tests only
 option(BUILD_TESTS_ONLY "Build Only Tests" OFF)
+if (NOT BUILD_TESTS_ONLY)
+    set(VCPKG_MANIFEST_FEATURES "app")
+endif()
 
 #--------
 # project
@@ -60,7 +63,6 @@ elseif(UNIX AND NOT APPLE)
 endif()
 add_compile_definitions(${GB_PLATFORM_DEFINITIONS})
 
-
 add_subdirectory(core)
 
 # testing stuff
@@ -69,5 +71,6 @@ include(CTest)
 add_subdirectory(tests)
 
 if (NOT BUILD_TESTS_ONLY)
+    set(VCPKG_MANIFEST_FEATURES "app")
     add_subdirectory(app)
 endif()
