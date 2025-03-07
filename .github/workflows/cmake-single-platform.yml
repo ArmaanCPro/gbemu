@@ -23,6 +23,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Cache vcpkg
+      - name: Cache vcpkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/vcpkg
+            ~/.cache/vcpkg/archives
+            ${{ github.workspace }}/build/vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
+
+      # Cache apt packages
+      - name: Cache apt packages
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt', '.github/workflows/cmake.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       # Install required dependencies including Ninja
       - name: Install Dependencies
         run: |
@@ -33,19 +54,52 @@ jobs:
             xorg-dev \
             libglu1-mesa-dev \
             pkg-config \
-            ninja-build
+            ninja-build \
+            ccache
+
+      # Set up ccache
+      - name: Set up ccache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ runner.os }}-ccache-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-ccache-
+
+      - name: Configure ccache
+        run: |
+          ccache --max-size=2G
+          ccache --set-config=compression=true
+          echo 'export PATH="/usr/lib/ccache:$PATH"' >> ~/.bashrc
+          source ~/.bashrc
+
+      # Cache CMake build directory
+      - name: Cache CMake build
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/build
+          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake', 'vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cmake-
+
+      - name: ccache statistics before build
+        run: ccache -s
 
       - name: Configure CMake
         run: >
           cmake --preset ${{ env.config_preset }} -B ${{ github.workspace }}/build 
           -G "${{ env.generator }}"
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache
           -DCMAKE_CXX_COMPILER=${{ env.cpp_compiler }} 
           -DCMAKE_C_COMPILER=${{ env.c_compiler }}
           -S ${{ github.workspace }}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+      - name: ccache statistics after build
+        run: ccache -s
 
       - name: Test
         working-directory: ${{github.workspace}}/build
