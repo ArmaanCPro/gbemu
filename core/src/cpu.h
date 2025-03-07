@@ -4,13 +4,18 @@
 #include <cstdint>
 
 #include "memory_map.h"
-#include "../resources/dmg_opcodes.h"
-
-#include <functional>
 
 namespace gb
 {
     struct cpu;
+
+    enum flag_types : uint8_t
+    {
+        FLAG_Z = 0x80,
+        FLAG_N = 0x40,
+        FLAG_H = 0x20,
+        FLAG_C = 0x10
+    };
 }
 
 
@@ -64,9 +69,23 @@ struct gb::cpu
 
     void init_instruction_table();
 
+    bool set_flag(flag_types flag, bool value)
+    {
+        if (value)
+        {
+            AF.full |= flag;
+        }
+        else
+        {
+            AF.full &= ~flag;
+        }
+        return value;
+    }
+
 
     uint32_t invalid_opcode(memory_map&);
-    uint32_t nop(memory_map&) { return 1; }
+    uint32_t nop(memory_map&);
+    uint32_t dec_sp(memory_map&);
     uint32_t ld_sp_nn(memory_map& mem);
     uint32_t ld_bc_nn(memory_map& mem);
     uint32_t ld_hl_nn(memory_map& mem);
@@ -81,6 +100,7 @@ struct gb::cpu
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);
     uint32_t inc_a(memory_map&);
+    uint32_t inc_hl_mem(memory_map& mem);
     uint32_t inc_hl(memory_map&);
     uint32_t dec_a(memory_map&);
     uint32_t and_a(memory_map&);

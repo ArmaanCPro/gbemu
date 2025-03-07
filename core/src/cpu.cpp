@@ -2,8 +2,7 @@
 
 #include <iostream>
 #include <filesystem>
-#include "../resources/dmg_boot.h"
-#include <sstream>
+#include "../resources/dmg_opcodes.h"
 
 uint32_t gb::cpu::execute(memory_map& mem)
 {
@@ -40,6 +39,8 @@ void gb::cpu::init_instruction_table()
     std::fill_n(instruction_table, 256, &cpu::invalid_opcode);
     instruction_table[NOP] = &cpu::nop;
 
+    instruction_table[DEC_SP] = &cpu::dec_sp;
+
     instruction_table[LD_SP_NN] = &cpu::ld_sp_nn;
     instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
     instruction_table[LD_HL_NN] = &cpu::ld_hl_nn;
@@ -55,6 +56,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[POP_BC] = &cpu::pop_bc;
     instruction_table[INC_A] = &cpu::inc_a;
     instruction_table[INC_HL] = &cpu::inc_hl;
+    instruction_table[INC_HL_MEM] = &cpu::inc_hl_mem;
     instruction_table[DEC_A] = &cpu::dec_a;
     instruction_table[AND_A] = &cpu::and_a;
     instruction_table[OR_A] = &cpu::or_a;
@@ -66,6 +68,17 @@ uint32_t gb::cpu::invalid_opcode(memory_map&)
     // [address, opcode]
     //std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
     return 0;
+}
+
+uint32_t gb::cpu::nop(memory_map&)
+{
+    return 1;
+}
+
+uint32_t gb::cpu::dec_sp(memory_map&)
+{
+    SP--;
+    return 2;
 }
 
 uint32_t gb::cpu::ld_sp_nn(memory_map& mem)
@@ -181,6 +194,18 @@ uint32_t gb::cpu::inc_a(memory_map&)
 {
     AF.high++;
     return 2;
+}
+
+uint32_t gb::cpu::inc_hl_mem(memory_map& mem)
+{
+    uint8_t value = mem.read(HL.full);
+    bool half_carry = (value & 0x0F) == 0x0F;
+    value++;
+    mem.write(HL.full, value);
+    set_flag(FLAG_Z, value == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, half_carry);
+    return 4;
 }
 
 uint32_t gb::cpu::inc_hl(memory_map&)
