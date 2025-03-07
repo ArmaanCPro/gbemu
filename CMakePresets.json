@@ -93,14 +93,46 @@
     {
       "name": "app-debug",
       "displayName": "Debug App Build",
-      "targets": [ "app" ],
-      "configuration": "Debug"
+      "configurePreset": "debug-default",
+      "configuration": "Debug",
+      "targets": [ "app" ]
     },
     {
       "name": "app-release",
       "displayName": "Release App Build",
-      "targets": [ "app" ],
-      "configuration": "Release"
+      "configurePreset": "release-default",
+      "configuration": "Release",
+      "targets": [ "app" ]
+    },
+
+    {
+      "name": "app-debug-msvc",
+      "displayName": "Debug App Build (MSVC)",
+      "configurePreset": "debug-msvc",
+      "configuration": "Debug",
+      "targets": [ "app" ]
+    },
+    {
+      "name": "app-release-msvc",
+      "displayName": "Release App Build (MSVC)",
+      "configurePreset": "release-msvc",
+      "configuration": "Release",
+      "targets": [ "app" ]
+    },
+
+    {
+      "name": "app-debug-mingw",
+      "displayName": "Debug App Build (MinGW)",
+      "configurePreset": "debug-mingw",
+      "configuration": "Debug",
+      "targets": [ "app" ]
+    },
+    {
+      "name": "app-release-mingw",
+      "displayName": "Release App Build (MinGW)",
+      "configurePreset": "release-mingw",
+      "configuration": "Release",
+      "targets": [ "app" ]
     }
   ]
 
