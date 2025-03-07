@@ -23,24 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Cache vcpkg
-      - name: Cache vcpkg
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ github.workspace }}/vcpkg
-            ~/.cache/vcpkg/archives
-            ${{ github.workspace }}/build/vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
-
       # Cache apt packages
       - name: Cache apt packages
         uses: actions/cache@v3
         with:
           path: /var/cache/apt/archives
-          key: ${{ runner.os }}-apt-${{ hashFiles('**/apt-packages.txt', '.github/workflows/cmake.yml') }}
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/cmake.yml') }}
           restore-keys: |
             ${{ runner.os }}-apt-
 
@@ -58,12 +46,16 @@ jobs:
             ccache
 
       # Set up ccache
-      - name: Set up ccache
+      - name: Create ccache directory
+        run: mkdir -p ~/.ccache
+
+      - name: Cache ccache output
         uses: actions/cache@v3
         with:
           path: ~/.ccache
           key: ${{ runner.os }}-ccache-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-ccache-
+          restore-keys: |
+            ${{ runner.os }}-ccache-
 
       - name: Configure ccache
         run: |
@@ -72,12 +64,38 @@ jobs:
           echo 'export PATH="/usr/lib/ccache:$PATH"' >> ~/.bashrc
           source ~/.bashrc
 
-      # Cache CMake build directory
+      # Ensure vcpkg directories exist
+      - name: Ensure vcpkg directories exist
+        run: |
+          mkdir -p ~/.cache/vcpkg/archives
+          mkdir -p ${{ github.workspace }}/build/vcpkg_installed
+
+      # Cache vcpkg downloads
+      - name: Cache vcpkg archives
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/vcpkg/archives
+          key: ${{ runner.os }}-vcpkg-archives-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-archives-
+
+      # Cache vcpkg installed packages
+      - name: Cache vcpkg installed
+        uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/build/vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-installed-${{ hashFiles('vcpkg.json') }}
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-installed-
+
+      # Cache CMake build directory (excluding vcpkg_installed which is cached separately)
       - name: Cache CMake build
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/build
-          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake', 'vcpkg.json') }}
+          path: |
+            ${{ github.workspace }}/build
+            !${{ github.workspace }}/build/vcpkg_installed
+          key: ${{ runner.os }}-cmake-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', '**/*.cmake') }}
           restore-keys: |
             ${{ runner.os }}-cmake-
 
