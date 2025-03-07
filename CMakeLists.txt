@@ -34,6 +34,9 @@ endif()
 message(STATUS "Using VCPKG_ROOT: ${VCPKG_ROOT}")
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "vcpkg toolchain file")
 
+# for CI, build tests only
+option(BUILD_TESTS_ONLY "Build Only Tests" OFF)
+
 #--------
 # project
 # -------
@@ -59,9 +62,12 @@ add_compile_definitions(${GB_PLATFORM_DEFINITIONS})
 
 
 add_subdirectory(core)
-add_subdirectory(app)
 
 # testing stuff
 enable_testing()
 include(CTest)
 add_subdirectory(tests)
+
+if (NOT BUILD_TESTS_ONLY)
+    add_subdirectory(app)
+endif()

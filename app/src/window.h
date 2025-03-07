@@ -1,7 +1,6 @@
 #pragma once
 
-#include <../../build/debug-mingw/vcpkg_installed/x64-mingw-static/include/glad/glad.h>
-#include <../../build/debug-mingw/vcpkg_installed/x64-mingw-static/include/GLFW/glfw3.h>
+#include <GLFW/glfw3.h>
 #include <string>
 
 // note this isn't in gb namespace. it doesn't depend on the game boy.

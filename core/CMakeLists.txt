@@ -23,7 +23,6 @@ set  (SOURCES
 
 source_group("src" FILES ${SOURCES})
 
-
 add_library( core ${SOURCES} )
 
 target_include_directories( core PUBLIC "${PROJECT_SOURCE_DIR}/src" )
