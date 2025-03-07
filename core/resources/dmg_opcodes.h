@@ -77,7 +77,7 @@ static constexpr uint8_t
     LD_SP_NN     = 0x31,
     LD_SP_HL     = 0xF9,
     LD_HL_SPR    = 0xF8,    // LD HL, SP+r8
-    LD_MM_SP     = 0x08,    // LD (a16), SP
+    LD_NN_SP     = 0x08,    // LD (a16), SP
 
     // Load Instructions with Immediate Data
     LD_B_N       = 0x06,
@@ -98,8 +98,8 @@ static constexpr uint8_t
     LD_A_DE      = 0x1A,    // LD A, (DE)
     LD_A_HLI     = 0x2A,    // LD A, (HL+)
     LD_A_HLD     = 0x3A,    // LD A, (HL-)
-    LD_MM_A      = 0xEA,    // LD (a16), A
-    LD_A_MM      = 0xFA,    // LD A, (a16)
+    LD_NN_A      = 0xEA,    // LD (a16), A
+    LD_A_NN      = 0xFA,    // LD A, (a16)
     LDH_N_A      = 0xE0,    // LDH (a8), A
     LDH_A_N      = 0xF0,    // LDH A, (a8)
     LDH_C_A      = 0xE2,    // LDH (C), A

@@ -67,10 +67,13 @@ struct gb::cpu
 
     uint32_t invalid_opcode(memory_map&);
     uint32_t nop(memory_map&) { return 1; }
+    uint32_t ld_sp_nn(memory_map& mem);
     uint32_t ld_bc_nn(memory_map& mem);
     uint32_t ld_hl_nn(memory_map& mem);
+    uint32_t ld_nn_a(memory_map& mem);
     uint32_t ld_hld_a(memory_map& mem);
     uint32_t ld_a_n(memory_map& mem);
+    uint32_t ld_a_nn(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jr_nz_n(memory_map& mem);
     uint32_t call_nn(memory_map& mem);
@@ -78,7 +81,9 @@ struct gb::cpu
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);
     uint32_t inc_a(memory_map&);
+    uint32_t inc_hl(memory_map&);
     uint32_t dec_a(memory_map&);
     uint32_t and_a(memory_map&);
     uint32_t or_a(memory_map&);
+    uint32_t xor_a(memory_map&);
 };

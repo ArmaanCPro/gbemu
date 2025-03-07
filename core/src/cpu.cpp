@@ -40,10 +40,13 @@ void gb::cpu::init_instruction_table()
     std::fill_n(instruction_table, 256, &cpu::invalid_opcode);
     instruction_table[NOP] = &cpu::nop;
 
+    instruction_table[LD_SP_NN] = &cpu::ld_sp_nn;
     instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
     instruction_table[LD_HL_NN] = &cpu::ld_hl_nn;
+    instruction_table[LD_NN_A] = &cpu::ld_nn_a;
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
     instruction_table[LD_A_N] = &cpu::ld_a_n;
+    instruction_table[LD_A_NN] = &cpu::ld_a_nn;
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
     instruction_table[CALL_NN] = &cpu::call_nn;
@@ -51,9 +54,11 @@ void gb::cpu::init_instruction_table()
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
     instruction_table[INC_A] = &cpu::inc_a;
+    instruction_table[INC_HL] = &cpu::inc_hl;
     instruction_table[DEC_A] = &cpu::dec_a;
     instruction_table[AND_A] = &cpu::and_a;
     instruction_table[OR_A] = &cpu::or_a;
+    instruction_table[XOR_A] = &cpu::xor_a;
 }
 
 uint32_t gb::cpu::invalid_opcode(memory_map&)
@@ -61,6 +66,13 @@ uint32_t gb::cpu::invalid_opcode(memory_map&)
     // [address, opcode]
     //std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
     return 0;
+}
+
+uint32_t gb::cpu::ld_sp_nn(memory_map& mem)
+{
+    SP = mem.read(PC) | mem.read(PC + 1) << 8;
+    PC += 2;
+    return 3;
 }
 
 uint32_t gb::cpu::ld_bc_nn(memory_map& mem)
@@ -77,6 +89,14 @@ uint32_t gb::cpu::ld_hl_nn(memory_map& mem)
     return 3;
 }
 
+uint32_t gb::cpu::ld_nn_a(memory_map& mem)
+{
+    const uint16_t addr = mem.read(PC) | mem.read(PC + 1) << 8;
+    PC += 2;
+    mem.write(addr, AF.high);
+    return 4;
+}
+
 uint32_t gb::cpu::ld_hld_a(memory_map& mem)
 {
     mem.write(HL.full, AF.high);
@@ -88,6 +108,14 @@ uint32_t gb::cpu::ld_a_n(memory_map& mem)
 {
     AF.high = mem.read(PC++);
     return 2;
+}
+
+uint32_t gb::cpu::ld_a_nn(memory_map& mem)
+{
+    const uint16_t addr = mem.read(PC) | mem.read(PC + 1) << 8;
+    PC += 2;
+    AF.high = mem.read(addr);
+    return 4;
 }
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)
@@ -155,6 +183,12 @@ uint32_t gb::cpu::inc_a(memory_map&)
     return 2;
 }
 
+uint32_t gb::cpu::inc_hl(memory_map&)
+{
+    HL.full++;
+    return 2;
+}
+
 uint32_t gb::cpu::dec_a(memory_map&)
 {
     AF.high--;
@@ -177,5 +211,15 @@ uint32_t gb::cpu::or_a(memory_map&)
     AF.low = 0x0; // reset all flags
     if (AF.high == 0)
         AF.low |= 0x80; // set zero flag
+    return 1;
+}
+
+uint32_t gb::cpu::xor_a(memory_map&)
+{
+    //AF.high ^= AF.high;
+    AF.high = 0;
+    AF.low = 0x0; // reset all flags
+    //if (AF.high == 0)
+    AF.low |= 0x80; // set zero flag
     return 1;
 }
