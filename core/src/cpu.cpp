@@ -237,8 +237,8 @@ template <gb::cpu::r16 reg>
 uint32_t gb::cpu::add_hl_r16(memory_map&)
 {
     Register16& r = get_r16(reg);
-    const uint16_t result = HL.full + r.full;
-    HL.full = result;
+    const uint32_t result = HL.full + r.full;
+    HL.full = (uint16_t)result;
     set_flag(FLAG_N, false);
     set_flag(FLAG_H, ((HL.full & 0x0FFF) + (r.full & 0x0FFF)) > 0x0FFF);
     set_flag(FLAG_C, result > 0xFFFF);
