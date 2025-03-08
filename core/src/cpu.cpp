@@ -39,8 +39,6 @@ void gb::cpu::init_instruction_table()
     std::fill_n(instruction_table, 256, &cpu::invalid_opcode);
     instruction_table[NOP] = &cpu::nop;
 
-    instruction_table[DEC_SP] = &cpu::dec_sp;
-
     instruction_table[ADC_A_A] = &cpu::adc_a_r8<r8::A>;
     instruction_table[ADC_A_B] = &cpu::adc_a_r8<r8::B>;
     instruction_table[ADC_A_C] = &cpu::adc_a_r8<r8::C>;
@@ -70,7 +68,14 @@ void gb::cpu::init_instruction_table()
     instruction_table[INC_L] = &cpu::inc_l;
     instruction_table[INC_HL] = &cpu::inc_hl;
     instruction_table[INC_HL_MEM] = &cpu::inc_hl_mem;
-    instruction_table[DEC_A] = &cpu::dec_a;
+    instruction_table[DEC_A] = &cpu::dec_r8<r8::A>;
+    instruction_table[DEC_B] = &cpu::dec_r8<r8::B>;
+    instruction_table[DEC_C] = &cpu::dec_r8<r8::C>;
+    instruction_table[DEC_D] = &cpu::dec_r8<r8::D>;
+    instruction_table[DEC_E] = &cpu::dec_r8<r8::E>;
+    instruction_table[DEC_H] = &cpu::dec_r8<r8::H>;
+    instruction_table[DEC_L] = &cpu::dec_r8<r8::L>;
+    instruction_table[DEC_SP] = &cpu::dec_r16<r16::SP>;
     instruction_table[AND_A] = &cpu::and_a;
     instruction_table[OR_A] = &cpu::or_a;
     instruction_table[XOR_A] = &cpu::xor_a;
@@ -103,9 +108,21 @@ uint32_t gb::cpu::adc_a_r8(memory_map&)
     return 1;
 }
 
-uint32_t gb::cpu::dec_sp(memory_map&)
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::dec_r8(memory_map&)
 {
-    SP.full--;
+    uint8_t& r = get_r8(reg);
+    --r;
+    set_flag(FLAG_Z, r == 0);
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, (r & 0x0F) == 0x0);
+    return 1;
+}
+
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::dec_r16(memory_map&)
+{
+    --get_r16(reg).full;
     return 2;
 }
 
@@ -299,12 +316,6 @@ uint32_t gb::cpu::inc_hl_mem(memory_map& mem)
 uint32_t gb::cpu::inc_hl(memory_map&)
 {
     HL.full++;
-    return 2;
-}
-
-uint32_t gb::cpu::dec_a(memory_map&)
-{
-    AF.high--;
     return 2;
 }
 

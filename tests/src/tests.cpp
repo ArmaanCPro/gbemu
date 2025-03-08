@@ -241,6 +241,38 @@ TEST_F(CpuTests1, RET_OperationWorks)
     EXPECT_EQ(cpu.SP.full, oldSP + 2);
 }
 
+TEST_F(CpuTests1, DEC_R16_AND_SP_OperationWorks)
+{
+    /*
+    // test 1 - A
+    {
+        cpu.AF.high = 0x01;
+        mem.write(cpu.PC.full, DEC_A);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.high, 0x01 - 1);
+    }
+    */
+
+    // test 2 - SP
+    {
+        // given:
+        cpu.SP.full = 0xCF00;
+        mem.write(cpu.PC.full, DEC_SP);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cpu.SP.full, 0xCF00 - 1);
+    }
+}
+
 TEST_F(CpuTests1, PUSH_BC_OperationWorks)
 {
     // given:
@@ -304,9 +336,9 @@ TEST_F(CpuTests1, A_Register_Arithmetic_OperationsWork)
         const auto cycles = cpu.execute(mem);
 
         // then:
-        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cycles, 1);
         EXPECT_EQ(cpu.AF.high, 0x0);
-        EXPECT_EQ(cpu.AF.low, 0x0);
+        EXPECT_EQ(cpu.AF.low, gb::FLAG_Z | gb::FLAG_H | gb::FLAG_N);
     }
     // test 3: and w/ zero flag
     {

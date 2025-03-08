@@ -21,6 +21,7 @@ namespace gb
     union Register16
     {
         uint16_t full;
+
         struct
         {
             uint8_t low;
@@ -28,7 +29,6 @@ namespace gb
         };
     };
 }
-
 
 struct gb::cpu
 {
@@ -51,17 +51,11 @@ struct gb::cpu
     {
         A, B, C, D, E, H, L
     };
+
     enum class r16
     {
         BC, DE, HL, SP, PC
     };
-
-    // consider an array system for array indexing instead of switch statement:
-    /*
-    std::array<uint8_t*, 7> registers = {&AF.high, &BC.high, &BC.low, &DE.high, &DE.low, &HL.high, &HL.low};
-
-    constexpr uint8_t REG_A = 0, REG_B = 1, REG_C = 2, REG_D = 3, REG_E = 4, REG_H = 5, REG_L = 6;
-    */
 
     uint8_t& get_r8(r8 reg)
     {
@@ -85,6 +79,7 @@ struct gb::cpu
                 throw std::runtime_error("Invalid register r8");
         }
     }
+
     Register16& get_r16(r16 reg)
     {
         switch (reg)
@@ -149,7 +144,10 @@ struct gb::cpu
     uint32_t nop(memory_map&);
     template <r8 reg>
     uint32_t adc_a_r8(memory_map&);
-    uint32_t dec_sp(memory_map&);
+    template<r8 reg>
+    uint32_t dec_r8(memory_map&);
+    template<r16 reg>
+    uint32_t dec_r16(memory_map&);
     template <r16 reg>
     uint32_t ld_r16_nn(memory_map& mem);
     uint32_t ld_nn_a(memory_map& mem);
@@ -171,7 +169,6 @@ struct gb::cpu
     uint32_t inc_l(memory_map&);
     uint32_t inc_hl_mem(memory_map& mem);
     uint32_t inc_hl(memory_map&);
-    uint32_t dec_a(memory_map&);
     uint32_t and_a(memory_map&);
     uint32_t or_a(memory_map&);
     uint32_t xor_a(memory_map&);
