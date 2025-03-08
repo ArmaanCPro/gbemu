@@ -59,14 +59,17 @@ void gb::cpu::init_instruction_table()
     instruction_table[RET] = &cpu::ret;
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
-    instruction_table[INC_A] = &cpu::inc_a;
-    instruction_table[INC_B] = &cpu::inc_b;
-    instruction_table[INC_C] = &cpu::inc_c;
-    instruction_table[INC_D] = &cpu::inc_d;
-    instruction_table[INC_E] = &cpu::inc_e;
-    instruction_table[INC_H] = &cpu::inc_h;
-    instruction_table[INC_L] = &cpu::inc_l;
-    instruction_table[INC_HL] = &cpu::inc_hl;
+    instruction_table[INC_A] = &cpu::inc_r8<r8::A>;
+    instruction_table[INC_B] = &cpu::inc_r8<r8::B>;
+    instruction_table[INC_C] = &cpu::inc_r8<r8::C>;
+    instruction_table[INC_D] = &cpu::inc_r8<r8::D>;
+    instruction_table[INC_E] = &cpu::inc_r8<r8::E>;
+    instruction_table[INC_H] = &cpu::inc_r8<r8::H>;
+    instruction_table[INC_L] = &cpu::inc_r8<r8::L>;
+    instruction_table[INC_BC] = &cpu::inc_r16<r16::BC>;
+    instruction_table[INC_DE] = &cpu::inc_r16<r16::DE>;
+    instruction_table[INC_HL] = &cpu::inc_r16<r16::HL>;
+    instruction_table[INC_SP] = &cpu::inc_r16<r16::SP>;
     instruction_table[INC_HL_MEM] = &cpu::inc_hl_mem;
     instruction_table[DEC_A] = &cpu::dec_r8<r8::A>;
     instruction_table[DEC_B] = &cpu::dec_r8<r8::B>;
@@ -79,9 +82,29 @@ void gb::cpu::init_instruction_table()
     instruction_table[DEC_DE] = &cpu::dec_r16<r16::DE>;
     instruction_table[DEC_HL] = &cpu::dec_r16<r16::HL>;
     instruction_table[DEC_SP] = &cpu::dec_r16<r16::SP>;
-    instruction_table[AND_A] = &cpu::and_a;
-    instruction_table[OR_A] = &cpu::or_a;
-    instruction_table[XOR_A] = &cpu::xor_a;
+    instruction_table[AND_A] = &cpu::and_a_r8<r8::A>;
+    instruction_table[AND_B] = &cpu::and_a_r8<r8::B>;
+    instruction_table[AND_C] = &cpu::and_a_r8<r8::C>;
+    instruction_table[AND_D] = &cpu::and_a_r8<r8::D>;
+    instruction_table[AND_E] = &cpu::and_a_r8<r8::E>;
+    instruction_table[AND_H] = &cpu::and_a_r8<r8::H>;
+    instruction_table[AND_L] = &cpu::and_a_r8<r8::L>;
+
+    instruction_table[OR_A] = &cpu::or_a_r8<r8::A>;
+    instruction_table[OR_B] = &cpu::or_a_r8<r8::B>;
+    instruction_table[OR_C] = &cpu::or_a_r8<r8::C>;
+    instruction_table[OR_D] = &cpu::or_a_r8<r8::D>;
+    instruction_table[OR_E] = &cpu::or_a_r8<r8::E>;
+    instruction_table[OR_H] = &cpu::or_a_r8<r8::H>;
+    instruction_table[OR_L] = &cpu::or_a_r8<r8::L>;
+
+    instruction_table[XOR_A] = &cpu::xor_a_r8<r8::A>;
+    instruction_table[XOR_B] = &cpu::xor_a_r8<r8::B>;
+    instruction_table[XOR_C] = &cpu::xor_a_r8<r8::C>;
+    instruction_table[XOR_D] = &cpu::xor_a_r8<r8::D>;
+    instruction_table[XOR_E] = &cpu::xor_a_r8<r8::E>;
+    instruction_table[XOR_H] = &cpu::xor_a_r8<r8::H>;
+    instruction_table[XOR_L] = &cpu::xor_a_r8<r8::L>;
 }
 
 uint32_t gb::cpu::invalid_opcode(memory_map&)
@@ -234,72 +257,14 @@ uint32_t gb::cpu::pop_bc(memory_map& mem)
     return 3;
 }
 
-uint32_t gb::cpu::inc_a(memory_map&)
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::inc_r8(memory_map&)
 {
-    bool half_carry = (AF.high & 0x0F) == 0x0F;
-    AF.high++;
+    uint8_t& r = get_r8(reg);
+    bool half_carry = (r & 0x0F) == 0x0F;
+    ++r;
     AF.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, AF.high == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_b(memory_map&)
-{
-    bool half_carry = (BC.high & 0x0F) == 0x0F;
-    BC.high++;
-    BC.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, BC.high == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_c(memory_map&)
-{
-    bool half_carry = (BC.low & 0x0F) == 0x0F;
-    BC.low++;
-    BC.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, BC.low == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_d(memory_map&)
-{
-    bool half_carry = (DE.high & 0x0F) == 0x0F;
-    DE.high++;
-    DE.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, DE.high == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_e(memory_map&)
-{
-    bool half_carry = (DE.low & 0x0F) == 0x0F;
-    DE.low++;
-    DE.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, DE.low == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_h(memory_map&)
-{
-    bool half_carry = (HL.high & 0x0F) == 0x0F;
-    HL.high++;
-    HL.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, HL.high == 0);
-    set_flag(FLAG_H, half_carry);
-    return 1;
-}
-
-uint32_t gb::cpu::inc_l(memory_map&)
-{
-    bool half_carry = (HL.low & 0x0F) == 0x0F;
-    HL.low++;
-    HL.low &= FLAG_C; // preserve carry flag and clear
-    set_flag(FLAG_Z, HL.low == 0);
+    set_flag(FLAG_Z, r == 0);
     set_flag(FLAG_H, half_carry);
     return 1;
 }
@@ -316,37 +281,36 @@ uint32_t gb::cpu::inc_hl_mem(memory_map& mem)
     return 4;
 }
 
-uint32_t gb::cpu::inc_hl(memory_map&)
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::inc_r16(memory_map&)
 {
-    HL.full++;
+    ++get_r16(reg).full;
     return 2;
 }
 
-uint32_t gb::cpu::and_a(memory_map&)
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::and_a_r8(memory_map&)
 {
-    AF.high &= AF.high;
+    AF.high &= get_r8(reg);
     AF.low = 0x20; // Set half carry flag and no others
-    if (AF.high == 0)
-        AF.low |= 0x80; // Set zero flag
-
+    set_flag(FLAG_Z, AF.high == 0);
     return 1;
 }
 
-uint32_t gb::cpu::or_a(memory_map&)
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::or_a_r8(memory_map&)
 {
-    AF.high |= AF.high;
+    AF.high |= get_r8(reg);
     AF.low = 0x0; // reset all flags
-    if (AF.high == 0)
-        AF.low |= 0x80; // set zero flag
+    set_flag(FLAG_Z, AF.high == 0);
     return 1;
 }
 
-uint32_t gb::cpu::xor_a(memory_map&)
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::xor_a_r8(memory_map&)
 {
-    //AF.high ^= AF.high;
-    AF.high = 0;
+    AF.high ^= get_r8(reg);
     AF.low = 0x0; // reset all flags
-    //if (AF.high == 0)
-    AF.low |= 0x80; // set zero flag
+    set_flag(FLAG_Z, AF.high == 0);
     return 1;
 }
