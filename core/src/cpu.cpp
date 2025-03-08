@@ -68,6 +68,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[ADD_SP_N] = &cpu::add_sp_e;
 
     instruction_table[AND_HL] = &cpu::and_a_hl_mem;
+    instruction_table[AND_N] = &cpu::and_a_n;
 
     instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
