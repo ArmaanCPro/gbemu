@@ -144,6 +144,20 @@ struct gb::cpu
     uint32_t nop(memory_map&);
     template <r8 reg>
     uint32_t adc_a_r8(memory_map&);
+    uint32_t adc_a_hl_mem(memory_map& mem);
+    uint32_t adc_a_n(memory_map& mem);
+    template <r8 reg>
+    uint32_t add_a_r8(memory_map&);
+    uint32_t add_a_hl_mem(memory_map& mem);
+    uint32_t add_a_n(memory_map& mem);
+    template <r16 reg>
+    uint32_t add_hl_r16(memory_map&);
+    // e because it is signed
+    uint32_t add_sp_e(memory_map& mem);
+    template<r8 reg>
+    uint32_t and_a_r8(memory_map&);
+    uint32_t and_a_hl_mem(memory_map& mem);
+    uint32_t and_a_n(memory_map& mem);
     template<r8 reg>
     uint32_t dec_r8(memory_map&);
     template<r16 reg>
@@ -167,8 +181,6 @@ struct gb::cpu
     uint32_t inc_hl_mem(memory_map& mem);
     template<r16 reg>
     uint32_t inc_r16(memory_map&);
-    template<r8 reg>
-    uint32_t and_a_r8(memory_map&);
     template<r8 reg>
     uint32_t or_a_r8(memory_map&);
     template<r8 reg>

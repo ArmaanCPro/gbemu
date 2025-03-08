@@ -47,6 +47,28 @@ void gb::cpu::init_instruction_table()
     instruction_table[ADC_A_H] = &cpu::adc_a_r8<r8::H>;
     instruction_table[ADC_A_L] = &cpu::adc_a_r8<r8::L>;
 
+    instruction_table[ADC_A_HL] = &cpu::adc_a_hl_mem;
+    instruction_table[ADC_A_N] = &cpu::adc_a_n;
+
+    instruction_table[ADD_A_A] = &cpu::add_a_r8<r8::A>;
+    instruction_table[ADD_A_B] = &cpu::add_a_r8<r8::B>;
+    instruction_table[ADD_A_C] = &cpu::add_a_r8<r8::C>;
+    instruction_table[ADD_A_D] = &cpu::add_a_r8<r8::D>;
+    instruction_table[ADD_A_E] = &cpu::add_a_r8<r8::E>;
+    instruction_table[ADD_A_H] = &cpu::add_a_r8<r8::H>;
+    instruction_table[ADD_A_L] = &cpu::add_a_r8<r8::L>;
+
+    instruction_table[ADD_A_HL] = &cpu::add_a_hl_mem;
+    instruction_table[ADD_A_N] = &cpu::add_a_n;
+
+    instruction_table[ADD_HL_BC] = &cpu::add_hl_r16<r16::BC>;
+    instruction_table[ADD_HL_DE] = &cpu::add_hl_r16<r16::DE>;
+    instruction_table[ADD_HL_HL] = &cpu::add_hl_r16<r16::HL>;
+    instruction_table[ADD_HL_SP] = &cpu::add_hl_r16<r16::SP>;
+    instruction_table[ADD_SP_N] = &cpu::add_sp_e;
+
+    instruction_table[AND_HL] = &cpu::and_a_hl_mem;
+
     instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
     instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
@@ -145,6 +167,127 @@ uint32_t gb::cpu::adc_a_r8(memory_map&)
     set_flag(FLAG_H, ((orig_value & 0x0F) + (to_add & 0x0F) + get_flag(FLAG_C)) > 0x0F);
     set_flag(FLAG_C, result > 0xFF);
     return 1;
+}
+
+uint32_t gb::cpu::adc_a_hl_mem(memory_map& mem)
+{
+    const uint16_t result = AF.high + mem.read(HL.full) + get_flag(FLAG_C);
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((AF.high & 0x0F) + (mem.read(HL.full) & 0x0F) + get_flag(FLAG_C)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 2;
+}
+
+uint32_t gb::cpu::adc_a_n(memory_map& mem)
+{
+    const uint16_t result = AF.high + mem.read(PC.full++) + get_flag(FLAG_C);
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((AF.high & 0x0F) + (mem.read(PC.full++) & 0x0F) + get_flag(FLAG_C)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 2;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::add_a_r8(memory_map&)
+{
+    const uint8_t orig_value = AF.high;
+    const uint8_t to_add = get_r8(reg);
+    const uint16_t result = orig_value + to_add;
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((orig_value & 0x0F) + (to_add & 0x0F)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 1;
+}
+
+uint32_t gb::cpu::add_a_hl_mem(memory_map& mem)
+{
+    const uint16_t result = AF.high + mem.read(HL.full);
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((AF.high & 0x0F) + (mem.read(HL.full) & 0x0F)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 2;
+}
+
+uint32_t gb::cpu::add_a_n(memory_map& mem)
+{
+    const uint16_t result = AF.high + mem.read(PC.full++);
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((AF.high & 0x0F) + (mem.read(PC.full++) & 0x0F)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
+    return 2;
+}
+
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::add_hl_r16(memory_map&)
+{
+    Register16& r = get_r16(reg);
+    const uint16_t result = HL.full + r.full;
+    HL.full = result;
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((HL.full & 0x0FFF) + (r.full & 0x0FFF)) > 0x0FFF);
+    set_flag(FLAG_C, result > 0xFFFF);
+    return 2;
+}
+
+uint32_t gb::cpu::add_sp_e(memory_map& mem)
+{
+    const int8_t e = (int8_t)mem.read(PC.full++);
+    SP.full += e;
+    set_flag(FLAG_Z, false);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((SP.full & 0x0FFF) + (e & 0x0FFF)) > 0x0FFF);
+    set_flag(FLAG_C, (uint32_t(SP.full) + uint32_t(e)) > 0xFFFF);
+    return 4;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::and_a_r8(memory_map&)
+{
+    AF.high &= get_r8(reg);
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, true);
+    set_flag(FLAG_C, false);
+    return 1;
+}
+
+uint32_t gb::cpu::and_a_hl_mem(memory_map& mem)
+{
+    const uint8_t result = AF.high & mem.read(HL.full);
+    AF.high = result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, true);
+    set_flag(FLAG_C, false);
+    return 2;
+}
+
+uint32_t gb::cpu::and_a_n(memory_map& mem)
+{
+    AF.high = AF.high & mem.read(PC.full++);
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, true);
+    set_flag(FLAG_C, false);
+    return 2;
 }
 
 template <gb::cpu::r8 reg>
@@ -306,15 +449,6 @@ uint32_t gb::cpu::inc_r16(memory_map&)
 {
     ++get_r16(reg).full;
     return 2;
-}
-
-template <gb::cpu::r8 reg>
-uint32_t gb::cpu::and_a_r8(memory_map&)
-{
-    AF.high &= get_r8(reg);
-    AF.low = 0x20; // Set half carry flag and no others
-    set_flag(FLAG_Z, AF.high == 0);
-    return 1;
 }
 
 template <gb::cpu::r8 reg>
