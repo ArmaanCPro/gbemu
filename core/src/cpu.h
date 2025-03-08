@@ -150,6 +150,8 @@ struct gb::cpu
     uint32_t dec_r16(memory_map&);
     template <r16 reg>
     uint32_t ld_r16_nn(memory_map& mem);
+    template <r8 reg>
+    uint32_t ld_r8_nn(memory_map& mem);
     uint32_t ld_nn_a(memory_map& mem);
     uint32_t ld_hld_a(memory_map& mem);
     uint32_t ld_a_n(memory_map& mem);

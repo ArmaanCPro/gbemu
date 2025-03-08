@@ -46,6 +46,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[ADC_A_E] = &cpu::adc_a_r8<r8::E>;
     instruction_table[ADC_A_H] = &cpu::adc_a_r8<r8::H>;
     instruction_table[ADC_A_L] = &cpu::adc_a_r8<r8::L>;
+
     instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
     instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
@@ -53,12 +54,22 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
     instruction_table[LD_A_N] = &cpu::ld_a_n;
     instruction_table[LD_A_NN] = &cpu::ld_a_nn;
+
+    instruction_table[LD_A_N] = &cpu::ld_r8_nn<r8::A>;
+    instruction_table[LD_B_N] = &cpu::ld_r8_nn<r8::B>;
+    instruction_table[LD_C_N] = &cpu::ld_r8_nn<r8::C>;
+    instruction_table[LD_D_N] = &cpu::ld_r8_nn<r8::D>;
+    instruction_table[LD_E_N] = &cpu::ld_r8_nn<r8::E>;
+    instruction_table[LD_H_N] = &cpu::ld_r8_nn<r8::H>;
+    instruction_table[LD_L_N] = &cpu::ld_r8_nn<r8::L>;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
     instruction_table[CALL_NN] = &cpu::call_nn;
     instruction_table[RET] = &cpu::ret;
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
+
     instruction_table[INC_A] = &cpu::inc_r8<r8::A>;
     instruction_table[INC_B] = &cpu::inc_r8<r8::B>;
     instruction_table[INC_C] = &cpu::inc_r8<r8::C>;
@@ -71,6 +82,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[INC_HL] = &cpu::inc_r16<r16::HL>;
     instruction_table[INC_SP] = &cpu::inc_r16<r16::SP>;
     instruction_table[INC_HL_MEM] = &cpu::inc_hl_mem;
+
     instruction_table[DEC_A] = &cpu::dec_r8<r8::A>;
     instruction_table[DEC_B] = &cpu::dec_r8<r8::B>;
     instruction_table[DEC_C] = &cpu::dec_r8<r8::C>;
@@ -82,6 +94,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[DEC_DE] = &cpu::dec_r16<r16::DE>;
     instruction_table[DEC_HL] = &cpu::dec_r16<r16::HL>;
     instruction_table[DEC_SP] = &cpu::dec_r16<r16::SP>;
+
     instruction_table[AND_A] = &cpu::and_a_r8<r8::A>;
     instruction_table[AND_B] = &cpu::and_a_r8<r8::B>;
     instruction_table[AND_C] = &cpu::and_a_r8<r8::C>;
@@ -167,6 +180,13 @@ uint32_t gb::cpu::ld_r16_nn(memory_map& mem)
         r.high = mem.read(PC.full++);
     }
     return 3;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::ld_r8_nn(memory_map& mem)
+{
+    get_r8(reg) = mem.read(PC.full++);
+    return 2;
 }
 
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
