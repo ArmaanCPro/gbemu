@@ -35,6 +35,66 @@ struct gb::cpu
         power_up_sequence();
     }
 
+    // an enum allowing opcodes to choose a register as a parameter/template
+    enum class r8
+    {
+        A, B, C, D, E, H, L
+    };
+    enum class r16
+    {
+        BC, DE, HL, SP, PC, HL_MEM
+    };
+
+    // consider an array system for array indexing instead of switch statement:
+    /*
+    std::array<uint8_t*, 7> registers = {&AF.high, &BC.high, &BC.low, &DE.high, &DE.low, &HL.high, &HL.low};
+
+    constexpr uint8_t REG_A = 0, REG_B = 1, REG_C = 2, REG_D = 3, REG_E = 4, REG_H = 5, REG_L = 6;
+    */
+
+    uint8_t& get_r8(r8 reg)
+    {
+        switch (reg)
+        {
+            case r8::A:
+                return AF.high;
+            case r8::B:
+                return BC.high;
+            case r8::C:
+                return BC.low;
+            case r8::D:
+                return DE.high;
+            case r8::E:
+                return DE.low;
+            case r8::H:
+                return HL.high;
+            case r8::L:
+                return HL.low;
+            default:
+                throw std::runtime_error("Invalid register r8");
+        }
+    }
+    uint16_t& get_r16(r16 reg)
+    {
+        switch (reg)
+        {
+            case r16::BC:
+                return BC.full;
+            case r16::DE:
+                return DE.full;
+            case r16::HL:
+                return HL.full;
+            case r16::SP:
+                return SP;
+            case r16::PC:
+                return PC;
+            case r16::HL_MEM:
+                return HL.full;
+            default:
+                throw std::runtime_error("Invalid register r16");
+        }
+    }
+
     // allows viewing a register as both a 16 bit and 2 8 bit values
     union Register16
     {
@@ -90,6 +150,8 @@ struct gb::cpu
 
     uint32_t invalid_opcode(memory_map&);
     uint32_t nop(memory_map&);
+    template <r8 reg>
+    uint32_t adc_a_r8(memory_map&);
     uint32_t adc_a_a(memory_map&);
     uint32_t adc_a_b(memory_map&);
     uint32_t dec_sp(memory_map&);

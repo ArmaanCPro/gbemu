@@ -321,3 +321,39 @@ TEST_F(CpuTests1, A_Register_Arithmetic_OperationsWork)
         EXPECT_EQ(cpu.AF.low, 0x0);
     }
 }
+
+TEST_F(CpuTests1, ADC_A_R8_Template_OperationWorks)
+{
+    // test 1 - ADC_A_A
+    {
+        // given:
+        cpu.AF.high = 0x01;
+        cpu.AF.low = 0x00;
+        mem.write(cpu.PC, ADC_A_A);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.high, 0x02);
+        EXPECT_EQ(cpu.AF.low, 0x00);
+    }
+
+    // test 2 - ADC_A_B
+    {
+        // given:
+        cpu.AF.high = 0x01;
+        cpu.AF.low = 0x00;
+        cpu.BC.high = 0x02;
+        mem.write(cpu.PC, ADC_A_B);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.high, 0x03);
+        EXPECT_EQ(cpu.AF.low, 0x00);
+    }
+}

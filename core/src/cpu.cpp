@@ -41,8 +41,13 @@ void gb::cpu::init_instruction_table()
 
     instruction_table[DEC_SP] = &cpu::dec_sp;
 
-    instruction_table[ADC_A_A] = &cpu::adc_a_a;
-    instruction_table[ADC_A_B] = &cpu::adc_a_b;
+    instruction_table[ADC_A_A] = &cpu::adc_a_r8<r8::A>;
+    instruction_table[ADC_A_B] = &cpu::adc_a_r8<r8::B>;
+    instruction_table[ADC_A_C] = &cpu::adc_a_r8<r8::C>;
+    instruction_table[ADC_A_D] = &cpu::adc_a_r8<r8::D>;
+    instruction_table[ADC_A_E] = &cpu::adc_a_r8<r8::E>;
+    instruction_table[ADC_A_H] = &cpu::adc_a_r8<r8::H>;
+    instruction_table[ADC_A_L] = &cpu::adc_a_r8<r8::L>;
     instruction_table[LD_SP_NN] = &cpu::ld_sp_nn;
     instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
     instruction_table[LD_HL_NN] = &cpu::ld_hl_nn;
@@ -80,6 +85,21 @@ uint32_t gb::cpu::invalid_opcode(memory_map&)
 
 uint32_t gb::cpu::nop(memory_map&)
 {
+    return 1;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::adc_a_r8(memory_map&)
+{
+    const uint8_t orig_value = AF.high;
+    const uint8_t to_add = get_r8(reg);
+    const uint16_t result = orig_value + to_add + get_flag(FLAG_C);
+    AF.high = (uint8_t)result;
+    AF.low = 0x0;
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, ((orig_value & 0x0F) + (to_add & 0x0F) + get_flag(FLAG_C)) > 0x0F);
+    set_flag(FLAG_C, result > 0xFF);
     return 1;
 }
 
