@@ -16,6 +16,55 @@ namespace gb
         FLAG_H = 0x20, // half-carry
         FLAG_C = 0x10 // carry
     };
+
+    // allows viewing a register as both a 16 bit and 2 8 bit values
+    union Register16
+    {
+        uint16_t full;
+        struct
+        {
+            uint8_t low;
+            uint8_t high;
+        };
+
+        // operator overloads for temporary backwards compatability w/ SP and PC
+        Register16 operator++(int)
+        {
+            full++;
+            return *this;
+        }
+        Register16 operator--(int)
+        {
+            full--;
+            return *this;
+        }
+        Register16 operator+(int)
+        {
+            full += 1;
+            return *this;
+        }
+        Register16 operator-(int)
+        {
+            full -= 1;
+            return *this;
+        }
+        void operator+=(uint16_t rhs)
+        {
+            full += rhs;
+        }
+        void operator-=(uint16_t rhs)
+        {
+            full -= rhs;
+        }
+        void operator=(uint16_t rhs)
+        {
+            full = rhs;
+        }
+        operator uint16_t() const
+        {
+            return full;
+        }
+    };
 }
 
 
@@ -42,7 +91,7 @@ struct gb::cpu
     };
     enum class r16
     {
-        BC, DE, HL, SP, PC, HL_MEM
+        BC, DE, HL, SP, PC
     };
 
     // consider an array system for array indexing instead of switch statement:
@@ -74,38 +123,24 @@ struct gb::cpu
                 throw std::runtime_error("Invalid register r8");
         }
     }
-    uint16_t& get_r16(r16 reg)
+    Register16& get_r16(r16 reg)
     {
         switch (reg)
         {
             case r16::BC:
-                return BC.full;
+                return BC;
             case r16::DE:
-                return DE.full;
+                return DE;
             case r16::HL:
-                return HL.full;
+                return HL;
             case r16::SP:
                 return SP;
             case r16::PC:
                 return PC;
-            case r16::HL_MEM:
-                return HL.full;
             default:
                 throw std::runtime_error("Invalid register r16");
         }
     }
-
-    // allows viewing a register as both a 16 bit and 2 8 bit values
-    union Register16
-    {
-        uint16_t full;
-
-        struct
-        {
-            uint8_t low;
-            uint8_t high;
-        };
-    };
 
     Register16 AF; // Accumulator and flags. bit 7 (0x80) = z, 6 (0x40) = n, 5 (0x20) = h, 4 (0x10) = c
     Register16 BC;
@@ -113,8 +148,8 @@ struct gb::cpu
     Register16 HL;
 
     // these are accessed usually only as a full 16-bit register
-    uint16_t SP;
-    uint16_t PC;
+    Register16 SP;
+    Register16 PC;
 
     /** function pointer returning uint32_t (# cycles) taking memory_map&.
      * @param memory_map ref to a memory_map
@@ -152,12 +187,9 @@ struct gb::cpu
     uint32_t nop(memory_map&);
     template <r8 reg>
     uint32_t adc_a_r8(memory_map&);
-    uint32_t adc_a_a(memory_map&);
-    uint32_t adc_a_b(memory_map&);
     uint32_t dec_sp(memory_map&);
-    uint32_t ld_sp_nn(memory_map& mem);
-    uint32_t ld_bc_nn(memory_map& mem);
-    uint32_t ld_hl_nn(memory_map& mem);
+    template <r16 reg>
+    uint32_t ld_r16_nn(memory_map& mem);
     uint32_t ld_nn_a(memory_map& mem);
     uint32_t ld_hld_a(memory_map& mem);
     uint32_t ld_a_n(memory_map& mem);

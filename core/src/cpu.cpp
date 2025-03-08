@@ -6,13 +6,13 @@
 
 uint32_t gb::cpu::execute(memory_map& mem)
 {
-    const uint8_t opcode = mem.read(PC++);
+    const uint8_t opcode = mem.read(PC.full++);
     uint32_t cycles = 0; // instruction functions handle all the cycle info, no work needs to be done here
 
     if (opcode == CB_PREFIX)
     {
         // TODO CB opcode bullshits. maybe have another jump table for cb instructions
-        //uint8_t cb_opcode = mem.read(PC++);
+        //uint8_t cb_opcode = mem.read(PC.full++);
         // cb_instruction_table[cb_opcode]
     }
     else if (instruction_table[opcode] != nullptr)
@@ -26,8 +26,8 @@ uint32_t gb::cpu::execute(memory_map& mem)
 void gb::cpu::power_up_sequence()
 {
     // init cpu registers
-    SP = 0xFFFE;
-    PC = 0x0000;
+    SP.full = 0xFFFE;
+    PC.full = 0x0000;
     AF.full = 0x01B0;
     BC.full = 0x0013;
     DE.full = 0x00D8;
@@ -48,9 +48,9 @@ void gb::cpu::init_instruction_table()
     instruction_table[ADC_A_E] = &cpu::adc_a_r8<r8::E>;
     instruction_table[ADC_A_H] = &cpu::adc_a_r8<r8::H>;
     instruction_table[ADC_A_L] = &cpu::adc_a_r8<r8::L>;
-    instruction_table[LD_SP_NN] = &cpu::ld_sp_nn;
-    instruction_table[LD_BC_NN] = &cpu::ld_bc_nn;
-    instruction_table[LD_HL_NN] = &cpu::ld_hl_nn;
+    instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
+    instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
+    instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
     instruction_table[LD_NN_A] = &cpu::ld_nn_a;
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
     instruction_table[LD_A_N] = &cpu::ld_a_n;
@@ -79,7 +79,7 @@ void gb::cpu::init_instruction_table()
 uint32_t gb::cpu::invalid_opcode(memory_map&)
 {
     // [address, opcode]
-    //std::cerr << "Invalid opcode: [ 0x" << std::hex << PC << ", 0x" << std::hex << mem.read(PC) << " ]" << std::endl;
+    //std::cerr << "Invalid opcode: [ 0x" << std::hex << PC.full << ", 0x" << std::hex << mem.read(PC.full) << " ]" << std::endl;
     return 0;
 }
 
@@ -103,63 +103,32 @@ uint32_t gb::cpu::adc_a_r8(memory_map&)
     return 1;
 }
 
-uint32_t gb::cpu::adc_a_a(memory_map&)
-{
-    const uint8_t orig_value = AF.high;
-    const uint16_t result = orig_value + orig_value + get_flag(FLAG_C);
-    AF.full = result;
-    AF.low = 0x0;
-    set_flag(FLAG_Z, AF.high == 0);
-    set_flag(FLAG_N, false);
-    set_flag(FLAG_H, ((orig_value & 0x0F) + (orig_value & 0x0F) + get_flag(FLAG_C)) > 0x0F);
-    set_flag(FLAG_C, result > 0xFF);
-    return 1;
-}
-
-uint32_t gb::cpu::adc_a_b(memory_map&)
-{
-    const uint8_t to_add = BC.high;
-    const uint16_t result = to_add + to_add + get_flag(FLAG_C);
-    AF.full = result;
-    AF.low = 0x0;
-    set_flag(FLAG_Z, AF.high == 0);
-    set_flag(FLAG_N, false);
-    set_flag(FLAG_H, ((to_add & 0x0F) + (to_add & 0x0F) + get_flag(FLAG_C)) > 0x0F);
-    set_flag(FLAG_C, result > 0xFF);
-    return 1;
-}
-
 uint32_t gb::cpu::dec_sp(memory_map&)
 {
-    SP--;
+    SP.full--;
     return 2;
 }
 
-uint32_t gb::cpu::ld_sp_nn(memory_map& mem)
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::ld_r16_nn(memory_map& mem)
 {
-    SP = mem.read(PC) | mem.read(PC + 1) << 8;
-    PC += 2;
-    return 3;
-}
+    if (reg == r16::SP)
+    {
+        SP.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
+        PC.full += 2;
+        return 3;
+    }
 
-uint32_t gb::cpu::ld_bc_nn(memory_map& mem)
-{
-    BC.low = mem.read(PC++);
-    BC.high = mem.read(PC++);
-    return 3;
-}
-
-uint32_t gb::cpu::ld_hl_nn(memory_map& mem)
-{
-    HL.low = mem.read(PC++);
-    HL.high = mem.read(PC++);
+    Register16& r = get_r16(reg);
+    r.low = mem.read(PC.full++);
+    r.high = mem.read(PC.full++);
     return 3;
 }
 
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
 {
-    const uint16_t addr = mem.read(PC) | mem.read(PC + 1) << 8;
-    PC += 2;
+    const uint16_t addr = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
+    PC.full += 2;
     mem.write(addr, AF.high);
     return 4;
 }
@@ -173,30 +142,30 @@ uint32_t gb::cpu::ld_hld_a(memory_map& mem)
 
 uint32_t gb::cpu::ld_a_n(memory_map& mem)
 {
-    AF.high = mem.read(PC++);
+    AF.high = mem.read(PC.full++);
     return 2;
 }
 
 uint32_t gb::cpu::ld_a_nn(memory_map& mem)
 {
-    const uint16_t addr = mem.read(PC) | mem.read(PC + 1) << 8;
-    PC += 2;
+    const uint16_t addr = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
+    PC.full += 2;
     AF.high = mem.read(addr);
     return 4;
 }
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)
 {
-    PC = mem.read(PC) | mem.read(PC + 1) << 8; // low | high << 8
+    PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
     return 3;
 }
 
 uint32_t gb::cpu::jr_nz_n(memory_map& mem)
 {
-    const int8_t offset = static_cast<int8_t>(mem.read(PC++));
+    const int8_t offset = static_cast<int8_t>(mem.read(PC.full++));
     if (!(AF.low & 0x40)) // Check Zero flag (bit 6)
     {
-        PC += offset;
+        PC.full += offset;
         return 3;
     }
     return 2;
@@ -204,43 +173,43 @@ uint32_t gb::cpu::jr_nz_n(memory_map& mem)
 
 uint32_t gb::cpu::call_nn(memory_map& mem)
 {
-    const uint16_t target_addr = mem.read(PC) | (mem.read(PC + 1) << 8);
-    PC += 2;
+    const uint16_t target_addr = mem.read(PC.full) | (mem.read(PC.full + 1) << 8);
+    PC.full += 2;
 
-    // Push current PC onto stack (SP decrements by 2)
-    SP -= 2;
-    mem.write(SP + 1, (PC >> 8) & 0xFF); // Write high byte
-    mem.write(SP, PC & 0xFF); // Write low byte
+    // Push current PC.full onto stack (SP.full decrements by 2)
+    SP.full -= 2;
+    mem.write(SP.full + 1, (PC.full >> 8) & 0xFF); // Write high byte
+    mem.write(SP.full, PC.full & 0xFF); // Write low byte
 
     // Jump to target address
-    PC = target_addr;
+    PC.full = target_addr;
 
     return 6;
 }
 
 uint32_t gb::cpu::ret(memory_map& mem)
 {
-    // Pop PC from stack (SP increments by 2)
-    PC = mem.read(SP) | (mem.read(SP + 1) << 8);
-    SP += 2;
+    // Pop PC.full from stack (SP.full increments by 2)
+    PC.full = mem.read(SP.full) | (mem.read(SP.full + 1) << 8);
+    SP.full += 2;
     return 4;
 }
 
 uint32_t gb::cpu::push_bc(memory_map& mem)
 {
-    SP--;
-    mem.write(SP, BC.high);
-    SP--;
-    mem.write(SP, BC.low);
+    SP.full--;
+    mem.write(SP.full, BC.high);
+    SP.full--;
+    mem.write(SP.full, BC.low);
     return 4;
 }
 
 uint32_t gb::cpu::pop_bc(memory_map& mem)
 {
-    BC.low = mem.read(SP);
-    SP++;
-    BC.high = mem.read(SP);
-    SP++;
+    BC.low = mem.read(SP.full);
+    SP.full++;
+    BC.high = mem.read(SP.full);
+    SP.full++;
     return 3;
 }
 
