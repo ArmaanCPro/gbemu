@@ -26,44 +26,6 @@ namespace gb
             uint8_t low;
             uint8_t high;
         };
-
-        // operator overloads for temporary backwards compatability w/ SP and PC
-        Register16 operator++(int)
-        {
-            full++;
-            return *this;
-        }
-        Register16 operator--(int)
-        {
-            full--;
-            return *this;
-        }
-        Register16 operator+(int)
-        {
-            full += 1;
-            return *this;
-        }
-        Register16 operator-(int)
-        {
-            full -= 1;
-            return *this;
-        }
-        void operator+=(uint16_t rhs)
-        {
-            full += rhs;
-        }
-        void operator-=(uint16_t rhs)
-        {
-            full -= rhs;
-        }
-        void operator=(uint16_t rhs)
-        {
-            full = rhs;
-        }
-        operator uint16_t() const
-        {
-            return full;
-        }
     };
 }
 
@@ -76,8 +38,8 @@ struct gb::cpu
         BC(),
         DE(),
         HL(),
-        SP(0),
-        PC(0),
+        SP(),
+        PC(),
         instruction_table{}
     {
         init_instruction_table();
