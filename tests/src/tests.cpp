@@ -243,20 +243,18 @@ TEST_F(CpuTests1, RET_OperationWorks)
 
 TEST_F(CpuTests1, DEC_R16_AND_SP_OperationWorks)
 {
-    /*
-    // test 1 - A
+    // test 1 - BC
     {
-        cpu.AF.high = 0x01;
-        mem.write(cpu.PC.full, DEC_A);
+        cpu.BC.full = 0x0520;
+        mem.write(cpu.PC.full, DEC_BC);
 
         // when:
         const auto cycles = cpu.execute(mem);
 
         // then:
-        EXPECT_EQ(cycles, 1);
-        EXPECT_EQ(cpu.AF.high, 0x01 - 1);
+        EXPECT_EQ(cycles, 2);
+        EXPECT_EQ(cpu.BC.full, 0x0520 - 1);
     }
-    */
 
     // test 2 - SP
     {

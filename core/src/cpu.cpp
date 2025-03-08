@@ -75,6 +75,9 @@ void gb::cpu::init_instruction_table()
     instruction_table[DEC_E] = &cpu::dec_r8<r8::E>;
     instruction_table[DEC_H] = &cpu::dec_r8<r8::H>;
     instruction_table[DEC_L] = &cpu::dec_r8<r8::L>;
+    instruction_table[DEC_BC] = &cpu::dec_r16<r16::BC>;
+    instruction_table[DEC_DE] = &cpu::dec_r16<r16::DE>;
+    instruction_table[DEC_HL] = &cpu::dec_r16<r16::HL>;
     instruction_table[DEC_SP] = &cpu::dec_r16<r16::SP>;
     instruction_table[AND_A] = &cpu::and_a;
     instruction_table[OR_A] = &cpu::or_a;
