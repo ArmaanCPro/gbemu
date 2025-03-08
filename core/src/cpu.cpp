@@ -112,16 +112,17 @@ uint32_t gb::cpu::dec_sp(memory_map&)
 template <gb::cpu::r16 reg>
 uint32_t gb::cpu::ld_r16_nn(memory_map& mem)
 {
-    if (reg == r16::SP)
+    if constexpr (reg == r16::SP) // could also use template specialization
     {
         SP.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
         PC.full += 2;
-        return 3;
     }
-
-    Register16& r = get_r16(reg);
-    r.low = mem.read(PC.full++);
-    r.high = mem.read(PC.full++);
+    else
+    {
+        Register16& r = get_r16(reg);
+        r.low = mem.read(PC.full++);
+        r.high = mem.read(PC.full++);
+    }
     return 3;
 }
 

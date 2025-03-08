@@ -30,6 +30,21 @@ TEST_F(CpuTests1, NopOperationWorks)
     EXPECT_EQ(cycles, 1);
 }
 
+TEST_F(CpuTests1, LD_SP_NN_OperationWorks)
+{
+    // given:
+    mem.write(cpu.PC.full, LD_SP_NN);
+    mem.write(cpu.PC.full + 1, 0x21);
+    mem.write(cpu.PC.full + 2, 0x58);
+
+    // when:
+    const auto cycles = cpu.execute(mem);
+
+    // then:
+    EXPECT_EQ(cycles, 3);
+    EXPECT_EQ(cpu.SP.full, 0x5821);
+}
+
 TEST_F(CpuTests1, LD_BC_NN_OperationWorks)
 {
     // given:
