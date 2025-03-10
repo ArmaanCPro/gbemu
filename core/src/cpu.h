@@ -142,6 +142,9 @@ struct gb::cpu
     uint32_t ccf(memory_map&);
     template <r8 reg>
     uint32_t cp_a_r8(memory_map&);
+    uint32_t cp_a_hl_mem(memory_map& mem);
+    uint32_t cp_a_n(memory_map& mem);
+    uint32_t cpl(memory_map&);
     template <r8 reg>
     uint32_t dec_r8(memory_map&);
     template <r16 reg>

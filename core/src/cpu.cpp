@@ -78,6 +78,9 @@ void gb::cpu::init_instruction_table()
     instruction_table[CP_E] = &cpu::cp_a_r8<r8::E>;
     instruction_table[CP_H] = &cpu::cp_a_r8<r8::H>;
     instruction_table[CP_L] = &cpu::cp_a_r8<r8::L>;
+    instruction_table[CP_HL] = &cpu::cp_a_hl_mem;
+    instruction_table[CP_N] = &cpu::cp_a_n;
+    instruction_table[CPL] = &cpu::cpl;
 
     instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
@@ -465,6 +468,36 @@ uint32_t gb::cpu::ccf(memory_map&)
     set_flag(FLAG_N, false);
     set_flag(FLAG_H, false);
     set_flag(FLAG_C, !get_flag(FLAG_C));
+    return 1;
+}
+
+uint32_t gb::cpu::cp_a_hl_mem(memory_map& mem)
+{
+    const uint8_t mem_value = mem.read(HL.full);
+    const uint8_t result = AF.high - mem_value;
+    set_flag(FLAG_Z, result == 0);
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, (AF.high & 0xF) < (mem_value & 0xF));
+    set_flag(FLAG_C, AF.high < mem_value);
+    return 2;
+}
+
+uint32_t gb::cpu::cp_a_n(memory_map& mem)
+{
+    const uint8_t mem_value = mem.read(PC.full++);
+    const uint8_t result = AF.high - mem_value;
+    set_flag(FLAG_Z, result == 0);
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, (AF.high & 0xF) < (mem_value & 0xF));
+    set_flag(FLAG_C, AF.high < mem_value);
+    return 2;
+}
+
+uint32_t gb::cpu::cpl(memory_map&)
+{
+    AF.high = ~AF.high;
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, true);
     return 1;
 }
 
