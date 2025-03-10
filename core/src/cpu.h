@@ -168,7 +168,12 @@ struct gb::cpu
     uint32_t jp_nc_nn(memory_map& mem);
     uint32_t jp_c_nn(memory_map& mem);
     uint32_t jp_hl(memory_map&);
+    // some websites may refer to this as jr_n16 or jr_r8. effectively, this is a signed 8-bit relative jump
+    uint32_t jr_e(memory_map& mem);
     uint32_t jr_nz_n(memory_map& mem);
+    uint32_t jr_z_n(memory_map& mem);
+    uint32_t jr_nc_n(memory_map& mem);
+    uint32_t jr_c_n(memory_map& mem);
     uint32_t ret(memory_map& mem);
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);

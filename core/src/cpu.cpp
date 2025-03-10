@@ -104,7 +104,12 @@ void gb::cpu::init_instruction_table()
     instruction_table[JP_NC_NN] = &cpu::jp_nc_nn;
     instruction_table[JP_C_NN] = &cpu::jp_c_nn;
     instruction_table[JP_HL] = &cpu::jp_hl;
+    instruction_table[JR_N] = &cpu::jr_e;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
+    instruction_table[JR_Z_N] = &cpu::jr_z_n;
+    instruction_table[JR_NC_N] = &cpu::jr_nc_n;
+    instruction_table[JR_C_N] = &cpu::jr_c_n;
+
     instruction_table[CALL_NN] = &cpu::call_nn;
     instruction_table[CALL_NZ_NN] = &cpu::call_nz_nn;
     instruction_table[CALL_Z_NN] = &cpu::call_z_nn;
@@ -452,13 +457,45 @@ uint32_t gb::cpu::jp_hl(memory_map&)
     return 1;
 }
 
+uint32_t gb::cpu::jr_e(memory_map& mem)
+{
+    const int8_t offset = (int8_t)(mem.read(PC.full++));
+    PC.full += offset;
+    return 3;
+}
+
 uint32_t gb::cpu::jr_nz_n(memory_map& mem)
 {
-    const int8_t offset = static_cast<int8_t>(mem.read(PC.full++));
-    if (!(AF.low & 0x40)) // Check Zero flag (bit 6)
+    if (get_flag(FLAG_Z))
     {
-        PC.full += offset;
-        return 3;
+        return 2;
+    }
+    return jr_e(mem);
+}
+
+uint32_t gb::cpu::jr_z_n(memory_map& mem)
+{
+    if (get_flag(FLAG_Z))
+    {
+        return jr_e(mem);
+    }
+    return 2;
+}
+
+uint32_t gb::cpu::jr_nc_n(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        return 2;
+    }
+    return jr_e(mem);
+}
+
+uint32_t gb::cpu::jr_c_n(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        return jr_e(mem);
     }
     return 2;
 }
