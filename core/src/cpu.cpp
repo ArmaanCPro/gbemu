@@ -1,6 +1,7 @@
 #include "cpu.h"
 
 #include "../resources/dmg_opcodes.h"
+
 #include <filesystem>
 #include <iostream>
 
@@ -159,7 +160,7 @@ template <gb::cpu::r8 reg>
 uint32_t gb::cpu::adc_a_r8(memory_map&)
 {
     const uint8_t orig_value = AF.high;
-    const uint8_t to_add = get_r8(reg);
+    const uint8_t to_add = get_r8<reg>();
     const uint16_t result = orig_value + to_add + get_flag(FLAG_C);
     AF.high = (uint8_t)result;
     AF.low = 0x0;
@@ -198,7 +199,7 @@ template <gb::cpu::r8 reg>
 uint32_t gb::cpu::add_a_r8(memory_map&)
 {
     const uint8_t orig_value = AF.high;
-    const uint8_t to_add = get_r8(reg);
+    const uint8_t to_add = get_r8<reg>();
     const uint16_t result = orig_value + to_add;
     AF.high = (uint8_t)result;
     AF.low = 0x0;
@@ -236,7 +237,7 @@ uint32_t gb::cpu::add_a_n(memory_map& mem)
 template <gb::cpu::r16 reg>
 uint32_t gb::cpu::add_hl_r16(memory_map&)
 {
-    Register16& r = get_r16(reg);
+    Register16& r = get_r16<reg>();
     const uint32_t result = HL.full + r.full;
     HL.full = (uint16_t)result;
     set_flag(FLAG_N, false);
@@ -259,7 +260,7 @@ uint32_t gb::cpu::add_sp_e(memory_map& mem)
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::and_a_r8(memory_map&)
 {
-    AF.high &= get_r8(reg);
+    AF.high &= get_r8<reg>();
     AF.low = 0x0;
     set_flag(FLAG_Z, AF.high == 0);
     set_flag(FLAG_N, false);
@@ -294,7 +295,7 @@ uint32_t gb::cpu::and_a_n(memory_map& mem)
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::dec_r8(memory_map&)
 {
-    uint8_t& r = get_r8(reg);
+    uint8_t& r = get_r8<reg>();
     --r;
     set_flag(FLAG_Z, r == 0);
     set_flag(FLAG_N, true);
@@ -305,7 +306,7 @@ uint32_t gb::cpu::dec_r8(memory_map&)
 template <gb::cpu::r16 reg>
 uint32_t gb::cpu::dec_r16(memory_map&)
 {
-    --get_r16(reg).full;
+    --get_r16<reg>().full;
     return 2;
 }
 
@@ -319,7 +320,7 @@ uint32_t gb::cpu::ld_r16_nn(memory_map& mem)
     }
     else
     {
-        Register16& r = get_r16(reg);
+        Register16& r = get_r16<reg>();
         r.low = mem.read(PC.full++);
         r.high = mem.read(PC.full++);
     }
@@ -329,7 +330,7 @@ uint32_t gb::cpu::ld_r16_nn(memory_map& mem)
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::ld_r8_nn(memory_map& mem)
 {
-    get_r8(reg) = mem.read(PC.full++);
+    get_r8<reg>() = mem.read(PC.full++);
     return 2;
 }
 
@@ -424,7 +425,7 @@ uint32_t gb::cpu::pop_bc(memory_map& mem)
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::inc_r8(memory_map&)
 {
-    uint8_t& r = get_r8(reg);
+    uint8_t& r = get_r8<reg>();
     bool half_carry = (r & 0x0F) == 0x0F;
     ++r;
     AF.low &= FLAG_C; // preserve carry flag and clear
@@ -448,14 +449,14 @@ uint32_t gb::cpu::inc_hl_mem(memory_map& mem)
 template <gb::cpu::r16 reg>
 uint32_t gb::cpu::inc_r16(memory_map&)
 {
-    ++get_r16(reg).full;
+    ++get_r16<reg>().full;
     return 2;
 }
 
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::or_a_r8(memory_map&)
 {
-    AF.high |= get_r8(reg);
+    AF.high |= get_r8<reg>();
     AF.low = 0x0; // reset all flags
     set_flag(FLAG_Z, AF.high == 0);
     return 1;
@@ -464,7 +465,7 @@ uint32_t gb::cpu::or_a_r8(memory_map&)
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::xor_a_r8(memory_map&)
 {
-    AF.high ^= get_r8(reg);
+    AF.high ^= get_r8<reg>();
     AF.low = 0x0; // reset all flags
     set_flag(FLAG_Z, AF.high == 0);
     return 1;
