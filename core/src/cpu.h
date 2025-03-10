@@ -139,6 +139,7 @@ struct gb::cpu
     uint32_t call_z_nn(memory_map& mem);
     uint32_t call_nc_nn(memory_map& mem);
     uint32_t call_c_nn(memory_map& mem);
+    uint32_t ccf(memory_map&);
     template <r8 reg>
     uint32_t dec_r8(memory_map&);
     template <r16 reg>

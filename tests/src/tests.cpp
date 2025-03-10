@@ -402,3 +402,37 @@ TEST_F(CpuTests1, ADC_A_R8_Template_OperationWorks)
         EXPECT_EQ(cpu.AF.low, 0x00);
     }
 }
+
+TEST_F(CpuTests1, CCF_OperationWorks)
+{
+    // test 1 - true to false
+    {
+        // given:
+        cpu.AF.low = 0x00;
+        cpu.set_flag(gb::FLAG_C, true);
+        mem.write(cpu.PC.full, CCF);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.low, 0x00);
+        EXPECT_EQ(cpu.get_flag(gb::FLAG_C), false);
+    }
+    // test 2 - false to true
+    {
+        // given:
+        cpu.AF.low = 0x00;
+        cpu.set_flag(gb::FLAG_C, false);
+        mem.write(cpu.PC.full, CCF);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.low, 0x00 | gb::FLAG_C);
+        EXPECT_EQ(cpu.get_flag(gb::FLAG_C), true);
+    }
+}

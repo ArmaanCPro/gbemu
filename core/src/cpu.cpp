@@ -94,6 +94,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[CALL_Z_NN] = &cpu::call_z_nn;
     instruction_table[CALL_NC_NN] = &cpu::call_nc_nn;
     instruction_table[CALL_C_NN] = &cpu::call_c_nn;
+    instruction_table[CCF] = &cpu::ccf;
     instruction_table[RET] = &cpu::ret;
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
@@ -434,6 +435,14 @@ uint32_t gb::cpu::call_c_nn(memory_map& mem)
         return call_nn(mem);
     }
     return 3;
+}
+
+uint32_t gb::cpu::ccf(memory_map&)
+{
+    set_flag(FLAG_N, false);
+    set_flag(FLAG_H, false);
+    set_flag(FLAG_C, !get_flag(FLAG_C));
+    return 1;
 }
 
 uint32_t gb::cpu::ret(memory_map& mem)
