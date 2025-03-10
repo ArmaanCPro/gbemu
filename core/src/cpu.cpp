@@ -90,6 +90,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
     instruction_table[CALL_NN] = &cpu::call_nn;
+    instruction_table[CALL_NZ_NN] = &cpu::call_nz_nn;
+    instruction_table[CALL_Z_NN] = &cpu::call_z_nn;
+    instruction_table[CALL_NC_NN] = &cpu::call_nc_nn;
+    instruction_table[CALL_C_NN] = &cpu::call_c_nn;
     instruction_table[RET] = &cpu::ret;
     instruction_table[PUSH_BC] = &cpu::push_bc;
     instruction_table[POP_BC] = &cpu::pop_bc;
@@ -394,6 +398,42 @@ uint32_t gb::cpu::call_nn(memory_map& mem)
     PC.full = target_addr;
 
     return 6;
+}
+
+uint32_t gb::cpu::call_nz_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_Z))
+    {
+        return 3;
+    }
+    return call_nn(mem);
+}
+
+uint32_t gb::cpu::call_z_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_Z))
+    {
+        return call_nn(mem);
+    }
+    return 3;
+}
+
+uint32_t gb::cpu::call_nc_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        return 3;
+    }
+    return call_nn(mem);
+}
+
+uint32_t gb::cpu::call_c_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        return call_nn(mem);
+    }
+    return 3;
 }
 
 uint32_t gb::cpu::ret(memory_map& mem)

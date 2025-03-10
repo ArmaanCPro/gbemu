@@ -132,6 +132,13 @@ struct gb::cpu
     uint32_t and_a_r8(memory_map&);
     uint32_t and_a_hl_mem(memory_map& mem);
     uint32_t and_a_n(memory_map& mem);
+    // TODO CB bit operations here
+
+    uint32_t call_nn(memory_map& mem);
+    uint32_t call_nz_nn(memory_map& mem);
+    uint32_t call_z_nn(memory_map& mem);
+    uint32_t call_nc_nn(memory_map& mem);
+    uint32_t call_c_nn(memory_map& mem);
     template <r8 reg>
     uint32_t dec_r8(memory_map&);
     template <r16 reg>
@@ -146,7 +153,6 @@ struct gb::cpu
     uint32_t ld_a_nn(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jr_nz_n(memory_map& mem);
-    uint32_t call_nn(memory_map& mem);
     uint32_t ret(memory_map& mem);
     uint32_t push_bc(memory_map& mem);
     uint32_t pop_bc(memory_map& mem);
