@@ -167,6 +167,7 @@ struct gb::cpu
     uint32_t jp_z_nn(memory_map& mem);
     uint32_t jp_nc_nn(memory_map& mem);
     uint32_t jp_c_nn(memory_map& mem);
+    uint32_t jp_hl(memory_map&);
     uint32_t jr_nz_n(memory_map& mem);
     uint32_t ret(memory_map& mem);
     uint32_t push_bc(memory_map& mem);

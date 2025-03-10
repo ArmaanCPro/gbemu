@@ -103,6 +103,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
     instruction_table[JP_NC_NN] = &cpu::jp_nc_nn;
     instruction_table[JP_C_NN] = &cpu::jp_c_nn;
+    instruction_table[JP_HL] = &cpu::jp_hl;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
     instruction_table[CALL_NN] = &cpu::call_nn;
     instruction_table[CALL_NZ_NN] = &cpu::call_nz_nn;
@@ -443,6 +444,12 @@ uint32_t gb::cpu::jp_c_nn(memory_map& mem)
         return 4;
     }
     return 3;
+}
+
+uint32_t gb::cpu::jp_hl(memory_map&)
+{
+    PC.full = HL.full;
+    return 1;
 }
 
 uint32_t gb::cpu::jr_nz_n(memory_map& mem)
