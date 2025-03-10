@@ -469,3 +469,19 @@ TEST_F(CpuTests1, CP_A_R8_TemplateOperationWorks)
         EXPECT_EQ(cpu.AF.low, gb::FLAG_C | gb::FLAG_N | gb::FLAG_H);
     }
 }
+
+TEST_F(CpuTests1, CPL_OperationWorks)
+{
+    // given:
+    cpu.AF.high = 0x24;
+    cpu.AF.low = 0x00;
+    mem.write(cpu.PC.full, CPL);
+
+    // when:
+    const auto cycles = cpu.execute(mem);
+
+    // then:
+    EXPECT_EQ(cycles, 1);
+    EXPECT_EQ(cpu.AF.high, (uint8_t)~0x24); // ~0x24 is negative, but cpu always holds positive values
+    EXPECT_EQ(cpu.AF.low, gb::FLAG_N | gb::FLAG_H);
+}

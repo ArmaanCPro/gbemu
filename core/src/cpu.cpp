@@ -495,7 +495,7 @@ uint32_t gb::cpu::cp_a_n(memory_map& mem)
 
 uint32_t gb::cpu::cpl(memory_map&)
 {
-    AF.high = ~AF.high;
+    AF.high = (uint8_t)~AF.high;
     set_flag(FLAG_N, true);
     set_flag(FLAG_H, true);
     return 1;
