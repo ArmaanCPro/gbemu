@@ -501,6 +501,37 @@ uint32_t gb::cpu::cpl(memory_map&)
     return 1;
 }
 
+uint32_t gb::cpu::daa(memory_map&)
+{
+    uint8_t adjustment = 0x0;
+    bool carry = get_flag(FLAG_C);
+    if (get_flag(FLAG_N))
+    {
+        if (get_flag(FLAG_H))
+            adjustment += 0x06;
+        if (carry)
+            adjustment += 0x60;
+
+        AF.high -= adjustment;
+        // carry flag is preserved in subtraction mode
+    }
+    else
+    {
+        if (get_flag(FLAG_H) || ((AF.high & 0xF) > 0x9))
+            adjustment += 0x06;
+        if (carry || (AF.high > 0x99))
+        {
+            adjustment += 0x60;
+            carry = true;
+        }
+        AF.high += adjustment;
+    }
+    set_flag(FLAG_Z, AF.high == 0);
+    set_flag(FLAG_H, false);
+    set_flag(FLAG_C, carry);
+    return 1;
+}
+
 uint32_t gb::cpu::ret(memory_map& mem)
 {
     // Pop PC.full from stack (SP.full increments by 2)
