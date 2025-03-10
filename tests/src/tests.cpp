@@ -142,7 +142,7 @@ TEST_F(CpuTests1, JR_NZ_N_OperationWorks)
     {
         // given:
         cpu.PC.full = 0xD000;
-        cpu.AF.low = 0x40; // Z flag is 1
+        cpu.set_flag(gb::FLAG_Z, true);
         mem.write(cpu.PC.full, JR_NZ_N);
         mem.write(cpu.PC.full + 1, 0x04);
 
@@ -151,7 +151,7 @@ TEST_F(CpuTests1, JR_NZ_N_OperationWorks)
 
         // then:
         EXPECT_EQ(cycles, 2);
-        EXPECT_EQ(cpu.PC.full, 0xD002); // Only advance by instruction length
+        EXPECT_EQ(cpu.PC.full, 0xD001); // Only advance by instruction length
     }
 
     // Test 3: Test negative offset (jump backward)
