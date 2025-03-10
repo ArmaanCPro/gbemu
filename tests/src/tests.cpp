@@ -436,3 +436,36 @@ TEST_F(CpuTests1, CCF_OperationWorks)
         EXPECT_EQ(cpu.get_flag(gb::FLAG_C), true);
     }
 }
+
+TEST_F(CpuTests1, CP_A_R8_TemplateOperationWorks)
+{
+    // test 1 - (A - A)
+    {
+        // given:
+        cpu.AF.high = 0x02;
+        cpu.AF.low = 0x00;
+        mem.write(cpu.PC.full, CP_A);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.low, gb::FLAG_Z | gb::FLAG_N);
+    }
+    // test 2 - (A - B) when B > A
+    {
+        // given:
+        cpu.AF.high = 0x01;
+        cpu.AF.low = 0x00;
+        cpu.BC.high = 0x02;
+        mem.write(cpu.PC.full, CP_B);
+
+        // when:
+        const auto cycles = cpu.execute(mem);
+
+        // then:
+        EXPECT_EQ(cycles, 1);
+        EXPECT_EQ(cpu.AF.low, gb::FLAG_C | gb::FLAG_N | gb::FLAG_H);
+    }
+}

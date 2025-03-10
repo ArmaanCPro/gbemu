@@ -71,6 +71,14 @@ void gb::cpu::init_instruction_table()
     instruction_table[AND_HL] = &cpu::and_a_hl_mem;
     instruction_table[AND_N] = &cpu::and_a_n;
 
+    instruction_table[CP_A] = &cpu::cp_a_r8<r8::A>;
+    instruction_table[CP_B] = &cpu::cp_a_r8<r8::B>;
+    instruction_table[CP_C] = &cpu::cp_a_r8<r8::C>;
+    instruction_table[CP_D] = &cpu::cp_a_r8<r8::D>;
+    instruction_table[CP_E] = &cpu::cp_a_r8<r8::E>;
+    instruction_table[CP_H] = &cpu::cp_a_r8<r8::H>;
+    instruction_table[CP_L] = &cpu::cp_a_r8<r8::L>;
+
     instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
     instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
@@ -295,6 +303,21 @@ uint32_t gb::cpu::and_a_n(memory_map& mem)
     set_flag(FLAG_H, true);
     set_flag(FLAG_C, false);
     return 2;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::cp_a_r8(memory_map&)
+{
+    const uint8_t a_value = AF.high;
+    const uint8_t reg_value = get_r8<reg>();
+    const uint8_t result = a_value - reg_value;
+
+    set_flag(FLAG_Z, result == 0);
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, (a_value & 0xF) < (reg_value & 0xF));
+    set_flag(FLAG_C, a_value < reg_value);
+
+    return 1;
 }
 
 template <gb::cpu::r8 reg>
