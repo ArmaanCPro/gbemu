@@ -60,11 +60,13 @@ struct gb::cpu
     {
         A = 0, B = 1, C = 2, D = 3, E = 4, H = 5, L = 6
     };
+
     // enum specifying a 16 bit register, used for template access to registers
     enum class r16 : uint8_t
     {
         BC = 0, DE = 1, HL = 2, SP = 3, PC = 4
     };
+
     // two arrays used for compile time/template access to registers
     const std::array<Register16*, 5> register16s = {&BC, &DE, &HL, &SP, &PC};
     const std::array<uint8_t*, 7> register8s = {&AF.high, &BC.high, &BC.low, &DE.high, &DE.low, &HL.high, &HL.low};
@@ -75,6 +77,7 @@ struct gb::cpu
     {
         return *register8s[static_cast<uint8_t>(reg)];
     }
+
     // get a 16 bit register from a template type
     template <r16 reg>
     [[nodiscard]] Register16& get_r16() const
@@ -150,6 +153,7 @@ struct gb::cpu
     uint32_t dec_r8(memory_map&);
     template <r16 reg>
     uint32_t dec_r16(memory_map&);
+    uint32_t dec_hl_mem(memory_map& mem);
     template <r16 reg>
     uint32_t ld_r16_nn(memory_map& mem);
     template <r8 reg>
@@ -159,6 +163,10 @@ struct gb::cpu
     uint32_t ld_a_n(memory_map& mem);
     uint32_t ld_a_nn(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
+    uint32_t jp_nz_nn(memory_map& mem);
+    uint32_t jp_z_nn(memory_map& mem);
+    uint32_t jp_nc_nn(memory_map& mem);
+    uint32_t jp_c_nn(memory_map& mem);
     uint32_t jr_nz_n(memory_map& mem);
     uint32_t ret(memory_map& mem);
     uint32_t push_bc(memory_map& mem);

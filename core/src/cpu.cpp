@@ -99,6 +99,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_L_N] = &cpu::ld_r8_nn<r8::L>;
 
     instruction_table[JP_NN] = &cpu::jp_nn;
+    instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
+    instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
+    instruction_table[JP_NC_NN] = &cpu::jp_nc_nn;
+    instruction_table[JP_C_NN] = &cpu::jp_c_nn;
     instruction_table[JR_NZ_N] = &cpu::jr_nz_n;
     instruction_table[CALL_NN] = &cpu::call_nn;
     instruction_table[CALL_NZ_NN] = &cpu::call_nz_nn;
@@ -134,6 +138,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[DEC_DE] = &cpu::dec_r16<r16::DE>;
     instruction_table[DEC_HL] = &cpu::dec_r16<r16::HL>;
     instruction_table[DEC_SP] = &cpu::dec_r16<r16::SP>;
+    instruction_table[DEC_HL_MEM] = &cpu::dec_hl_mem;
 
     instruction_table[AND_A] = &cpu::and_a_r8<r8::A>;
     instruction_table[AND_B] = &cpu::and_a_r8<r8::B>;
@@ -397,6 +402,46 @@ uint32_t gb::cpu::ld_a_nn(memory_map& mem)
 uint32_t gb::cpu::jp_nn(memory_map& mem)
 {
     PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
+    return 4;
+}
+
+uint32_t gb::cpu::jp_nz_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_Z)) // Check Zero flag (bit 6)
+    {
+        return 3;
+    }
+    PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
+    return 4;
+}
+
+uint32_t gb::cpu::jp_z_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_Z))
+    {
+        PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
+        return 4;
+    }
+    return 3;
+}
+
+uint32_t gb::cpu::jp_nc_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        return 3;
+    }
+    PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
+    return 4;
+}
+
+uint32_t gb::cpu::jp_c_nn(memory_map& mem)
+{
+    if (get_flag(FLAG_C))
+    {
+        PC.full = mem.read(PC.full) | mem.read(PC.full + 1) << 8; // low | high << 8
+        return 4;
+    }
     return 3;
 }
 
@@ -530,6 +575,16 @@ uint32_t gb::cpu::daa(memory_map&)
     set_flag(FLAG_H, false);
     set_flag(FLAG_C, carry);
     return 1;
+}
+
+uint32_t gb::cpu::dec_hl_mem(memory_map& mem)
+{
+    const uint8_t mem_value = mem.read(HL.full);
+    mem.write(HL.full, mem_value - 1);
+    set_flag(FLAG_Z, mem_value - 1 == 0);
+    set_flag(FLAG_N, true);
+    set_flag(FLAG_H, ((mem_value - 1) & 0xF) == 0x0);
+    return 3;
 }
 
 uint32_t gb::cpu::ret(memory_map& mem)

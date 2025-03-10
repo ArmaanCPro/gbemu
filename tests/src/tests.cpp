@@ -7,8 +7,8 @@
 class CpuTests1 : public ::testing::Test
 {
 public:
-    gb::memory_map mem {};
-    gb::cpu cpu {};
+    gb::memory_map mem{};
+    gb::cpu cpu{};
 
     void SetUp() override
     {
@@ -116,7 +116,7 @@ TEST_F(CpuTests1, JP_NN_OperationWorks)
     const auto cycles = cpu.execute(mem);
 
     // then:
-    EXPECT_EQ(cycles, 3);
+    EXPECT_EQ(cycles, 4);
     EXPECT_EQ(cpu.PC.full, 0x2158);
 }
 
