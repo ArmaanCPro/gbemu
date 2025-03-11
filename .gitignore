@@ -11,3 +11,5 @@ CMakeUserPresets.json
 **.user.*
 **.env
 **.env.*
+
+compile_commands.json

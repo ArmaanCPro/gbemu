@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <filesystem>
 
 #include "cpu.h"
 #include "fb_renderer.h"
