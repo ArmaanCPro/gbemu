@@ -173,6 +173,7 @@ void gb::cpu::init_instruction_table()
 
     instruction_table[LDH_N_A] = &cpu::ldh_nn_a;
     instruction_table[LDH_C_A] = &cpu::ldh_c_a;
+    instruction_table[LDH_A_C] = &cpu::ldh_a_c;
 
     instruction_table[LD_A_BC] = &cpu::ld_a_r16_mem<r16::BC>;
     instruction_table[LD_A_DE] = &cpu::ld_a_r16_mem<r16::DE>;
@@ -543,6 +544,12 @@ uint32_t gb::cpu::ld_a_nn(memory_map& mem)
     PC.full += 2;
     AF.high = mem.read(addr);
     return 4;
+}
+
+uint32_t gb::cpu::ldh_a_c(memory_map& mem)
+{
+    AF.high = mem.read(0xFF00 + BC.low);
+    return 2;
 }
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)

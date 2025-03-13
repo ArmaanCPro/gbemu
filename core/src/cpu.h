@@ -177,6 +177,7 @@ struct gb::cpu
     template <r16 reg>
     uint32_t ld_a_r16_mem(memory_map& mem);
     uint32_t ld_a_nn(memory_map& mem);
+    uint32_t ldh_a_c(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jp_nz_nn(memory_map& mem);
     uint32_t jp_z_nn(memory_map& mem);
