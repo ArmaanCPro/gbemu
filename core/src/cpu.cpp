@@ -587,8 +587,8 @@ uint32_t gb::cpu::ld_nn_sp(memory_map& mem)
 {
     const uint16_t addr = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
     PC.full += 2;
-    mem.write(addr, SP.full & 0xFF); // low byte of SP
-    mem.write(addr + 1, SP.full >> 8); // high byte of SP
+    mem.write(addr, SP.low);
+    mem.write(addr + 1, SP.high);
     return 5;
 }
 
