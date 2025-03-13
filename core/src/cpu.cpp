@@ -98,6 +98,50 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_H_N] = &cpu::ld_r8_nn<r8::H>;
     instruction_table[LD_L_N] = &cpu::ld_r8_nn<r8::L>;
 
+    instruction_table[LD_A_A] = &cpu::ld_r8_r8<r8::A, r8::A>;
+    instruction_table[LD_A_B] = &cpu::ld_r8_r8<r8::A, r8::B>;
+    instruction_table[LD_A_C] = &cpu::ld_r8_r8<r8::A, r8::C>;
+    instruction_table[LD_A_D] = &cpu::ld_r8_r8<r8::A, r8::D>;
+    instruction_table[LD_A_E] = &cpu::ld_r8_r8<r8::A, r8::E>;
+    instruction_table[LD_A_H] = &cpu::ld_r8_r8<r8::A, r8::H>;
+    instruction_table[LD_A_L] = &cpu::ld_r8_r8<r8::A, r8::L>;
+    instruction_table[LD_B_B] = &cpu::ld_r8_r8<r8::B, r8::B>;
+    instruction_table[LD_B_C] = &cpu::ld_r8_r8<r8::B, r8::C>;
+    instruction_table[LD_B_D] = &cpu::ld_r8_r8<r8::B, r8::D>;
+    instruction_table[LD_B_E] = &cpu::ld_r8_r8<r8::B, r8::E>;
+    instruction_table[LD_B_H] = &cpu::ld_r8_r8<r8::B, r8::H>;
+    instruction_table[LD_B_L] = &cpu::ld_r8_r8<r8::B, r8::L>;
+    instruction_table[LD_C_C] = &cpu::ld_r8_r8<r8::C, r8::C>;
+    instruction_table[LD_C_D] = &cpu::ld_r8_r8<r8::C, r8::D>;
+    instruction_table[LD_C_E] = &cpu::ld_r8_r8<r8::C, r8::E>;
+    instruction_table[LD_C_H] = &cpu::ld_r8_r8<r8::C, r8::H>;
+    instruction_table[LD_C_L] = &cpu::ld_r8_r8<r8::C, r8::L>;
+    instruction_table[LD_D_D] = &cpu::ld_r8_r8<r8::D, r8::D>;
+    instruction_table[LD_D_E] = &cpu::ld_r8_r8<r8::D, r8::E>;
+    instruction_table[LD_D_H] = &cpu::ld_r8_r8<r8::D, r8::H>;
+    instruction_table[LD_D_L] = &cpu::ld_r8_r8<r8::D, r8::L>;
+    instruction_table[LD_E_A] = &cpu::ld_r8_r8<r8::E, r8::A>;
+    instruction_table[LD_E_B] = &cpu::ld_r8_r8<r8::E, r8::B>;
+    instruction_table[LD_E_C] = &cpu::ld_r8_r8<r8::E, r8::C>;
+    instruction_table[LD_E_D] = &cpu::ld_r8_r8<r8::E, r8::D>;
+    instruction_table[LD_E_E] = &cpu::ld_r8_r8<r8::E, r8::E>;
+    instruction_table[LD_E_H] = &cpu::ld_r8_r8<r8::E, r8::H>;
+    instruction_table[LD_E_L] = &cpu::ld_r8_r8<r8::E, r8::L>;
+    instruction_table[LD_H_A] = &cpu::ld_r8_r8<r8::H, r8::A>;
+    instruction_table[LD_H_B] = &cpu::ld_r8_r8<r8::H, r8::B>;
+    instruction_table[LD_H_C] = &cpu::ld_r8_r8<r8::H, r8::C>;
+    instruction_table[LD_H_D] = &cpu::ld_r8_r8<r8::H, r8::D>;
+    instruction_table[LD_H_E] = &cpu::ld_r8_r8<r8::H, r8::E>;
+    instruction_table[LD_H_H] = &cpu::ld_r8_r8<r8::H, r8::H>;
+    instruction_table[LD_H_L] = &cpu::ld_r8_r8<r8::H, r8::L>;
+    instruction_table[LD_L_A] = &cpu::ld_r8_r8<r8::L, r8::A>;
+    instruction_table[LD_L_B] = &cpu::ld_r8_r8<r8::L, r8::B>;
+    instruction_table[LD_L_C] = &cpu::ld_r8_r8<r8::L, r8::C>;
+    instruction_table[LD_L_D] = &cpu::ld_r8_r8<r8::L, r8::D>;
+    instruction_table[LD_L_E] = &cpu::ld_r8_r8<r8::L, r8::E>;
+    instruction_table[LD_L_H] = &cpu::ld_r8_r8<r8::L, r8::H>;
+    instruction_table[LD_L_L] = &cpu::ld_r8_r8<r8::L, r8::L>;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
@@ -374,6 +418,15 @@ uint32_t gb::cpu::ld_r8_nn(memory_map& mem)
 {
     get_r8<reg>() = mem.read(PC.full++);
     return 2;
+}
+
+template <gb::cpu::r8 reg_1, gb::cpu::r8 reg_2>
+uint32_t gb::cpu::ld_r8_r8(memory_map&)
+{
+    // could do LD_B_B as breakpoint or LD_D_D as a debug message
+    // otherwise storing a register into itself is a no-op
+    get_r8<reg_1>() = get_r8<reg_2>();
+    return 1;
 }
 
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
