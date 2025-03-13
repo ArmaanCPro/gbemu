@@ -213,6 +213,7 @@ struct gb::cpu
     template <r8 reg>
     uint32_t or_a_r8(memory_map&);
     uint32_t or_a_hl_mem(memory_map& mem);
+    uint32_t or_a_n(memory_map& mem);
     template <r8 reg>
     uint32_t xor_a_r8(memory_map&);
 };

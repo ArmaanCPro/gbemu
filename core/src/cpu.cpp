@@ -253,6 +253,7 @@ void gb::cpu::init_instruction_table()
     instruction_table[OR_L] = &cpu::or_a_r8<r8::L>;
 
     instruction_table[OR_HL] = &cpu::or_a_hl_mem;
+    instruction_table[OR_N] = &cpu::or_a_n;
 
     instruction_table[XOR_A] = &cpu::xor_a_r8<r8::A>;
     instruction_table[XOR_B] = &cpu::xor_a_r8<r8::B>;
@@ -901,6 +902,14 @@ uint32_t gb::cpu::or_a_r8(memory_map&)
 uint32_t gb::cpu::or_a_hl_mem(memory_map& mem)
 {
     AF.high = mem.read(HL.full) | AF.high;
+    AF.low = 0x0; // reset all flags
+    set_flag(FLAG_Z, AF.high == 0);
+    return 2;
+}
+
+uint32_t gb::cpu::or_a_n(memory_map& mem)
+{
+    AF.high = mem.read(PC.full++) | AF.high;
     AF.low = 0x0; // reset all flags
     set_flag(FLAG_Z, AF.high == 0);
     return 2;
