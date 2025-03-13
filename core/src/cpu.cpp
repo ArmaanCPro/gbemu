@@ -186,6 +186,7 @@ void gb::cpu::init_instruction_table()
 
     instruction_table[LD_NN_SP] = &cpu::ld_nn_sp;
     instruction_table[LD_HL_SPR] = &cpu::ld_hl_sp_e8;
+    instruction_table[LD_SP_HL] = &cpu::ld_sp_hl;
 
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
@@ -602,6 +603,12 @@ uint32_t gb::cpu::ld_hl_sp_e8(memory_map& mem)
     set_flag(FLAG_H, ((SP.full & 0xF) + (value & 0xF)) > 0xF); // Half-carry: bit 3 to 4
     set_flag(FLAG_C, ((SP.full & 0xFF) + (value & 0xFF)) > 0xFF); // Carry: bit 7 to 8
     return 3;
+}
+
+uint32_t gb::cpu::ld_sp_hl(memory_map&)
+{
+    SP.full = HL.full;
+    return 2;
 }
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)
