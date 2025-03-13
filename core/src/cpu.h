@@ -178,6 +178,14 @@ struct gb::cpu
     uint32_t ld_a_r16_mem(memory_map& mem);
     uint32_t ld_a_nn(memory_map& mem);
     uint32_t ldh_a_c(memory_map& mem);
+    // same as ldi_hl_a
+    uint32_t ld_hli_mem_a(memory_map& mem);
+    // same as ldd_hli_a
+    uint32_t ld_hld_mem_a(memory_map& mem);
+    // same as ldd_a_hl
+    uint32_t ld_a_hld_mem(memory_map& mem);
+    // same as ldi_a_hl
+    uint32_t ld_a_hli_mem(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jp_nz_nn(memory_map& mem);
     uint32_t jp_z_nn(memory_map& mem);

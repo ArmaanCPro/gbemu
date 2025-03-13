@@ -179,6 +179,11 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_A_DE] = &cpu::ld_a_r16_mem<r16::DE>;
     instruction_table[LD_A_HL] = &cpu::ld_a_r16_mem<r16::HL>;
 
+    instruction_table[LD_HLI_A] = &cpu::ld_hli_mem_a;
+    instruction_table[LD_HLD_A] = &cpu::ld_hld_mem_a;
+    instruction_table[LD_A_HLD] = &cpu::ld_a_hld_mem;
+    instruction_table[LD_A_HLI] = &cpu::ld_a_hli_mem;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
@@ -549,6 +554,30 @@ uint32_t gb::cpu::ld_a_nn(memory_map& mem)
 uint32_t gb::cpu::ldh_a_c(memory_map& mem)
 {
     AF.high = mem.read(0xFF00 + BC.low);
+    return 2;
+}
+
+uint32_t gb::cpu::ld_hli_mem_a(memory_map& mem)
+{
+    mem.write(HL.full++, AF.high);
+    return 2;
+}
+
+uint32_t gb::cpu::ld_hld_mem_a(memory_map& mem)
+{
+    mem.write(HL.full--, AF.high);
+    return 2;
+}
+
+uint32_t gb::cpu::ld_a_hld_mem(memory_map& mem)
+{
+    AF.high = mem.read(HL.full--);
+    return 2;
+}
+
+uint32_t gb::cpu::ld_a_hli_mem(memory_map& mem)
+{
+    AF.high = mem.read(HL.full++);
     return 2;
 }
 
