@@ -171,6 +171,8 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_DE_A] = &cpu::ld_r16_mem_a<r16::DE>;
     instruction_table[LD_HL_A] = &cpu::ld_r16_mem_a<r16::HL>;
 
+    instruction_table[LDH_N_A] = &cpu::ldh_nn_a;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
@@ -505,6 +507,14 @@ uint32_t gb::cpu::ld_hld_a(memory_map& mem)
     mem.write(HL.full, AF.high);
     HL.full--;
     return 2;
+}
+
+uint32_t gb::cpu::ldh_nn_a(memory_map& mem)
+{
+    const uint8_t offset = mem.read(PC.full++);
+    const uint16_t addr = 0xFF00 | offset; // Create high memory address
+    mem.write(addr, AF.high);
+    return 3;
 }
 
 uint32_t gb::cpu::ld_a_nn(memory_map& mem)
