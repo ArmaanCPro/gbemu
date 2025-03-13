@@ -252,6 +252,8 @@ void gb::cpu::init_instruction_table()
     instruction_table[OR_H] = &cpu::or_a_r8<r8::H>;
     instruction_table[OR_L] = &cpu::or_a_r8<r8::L>;
 
+    instruction_table[OR_HL] = &cpu::or_a_hl_mem;
+
     instruction_table[XOR_A] = &cpu::xor_a_r8<r8::A>;
     instruction_table[XOR_B] = &cpu::xor_a_r8<r8::B>;
     instruction_table[XOR_C] = &cpu::xor_a_r8<r8::C>;
@@ -887,13 +889,6 @@ uint32_t gb::cpu::inc_hl_mem(memory_map& mem)
     return 4;
 }
 
-template <gb::cpu::r16 reg>
-uint32_t gb::cpu::inc_r16(memory_map&)
-{
-    ++get_r16<reg>().full;
-    return 2;
-}
-
 template <gb::cpu::r8 reg>
 uint32_t gb::cpu::or_a_r8(memory_map&)
 {
@@ -901,6 +896,21 @@ uint32_t gb::cpu::or_a_r8(memory_map&)
     AF.low = 0x0; // reset all flags
     set_flag(FLAG_Z, AF.high == 0);
     return 1;
+}
+
+uint32_t gb::cpu::or_a_hl_mem(memory_map& mem)
+{
+    AF.high = mem.read(HL.full) | AF.high;
+    AF.low = 0x0; // reset all flags
+    set_flag(FLAG_Z, AF.high == 0);
+    return 2;
+}
+
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::inc_r16(memory_map&)
+{
+    ++get_r16<reg>().full;
+    return 2;
 }
 
 template <gb::cpu::r8 reg>
