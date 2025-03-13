@@ -87,7 +87,13 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
     instruction_table[LD_NN_A] = &cpu::ld_nn_a;
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
-    instruction_table[LD_A_N] = &cpu::ld_a_n;
+    instruction_table[LD_A_N] = &cpu::ld_r8_n<r8::A>;
+    instruction_table[LD_B_N] = &cpu::ld_r8_n<r8::B>;
+    instruction_table[LD_C_N] = &cpu::ld_r8_n<r8::C>;
+    instruction_table[LD_D_N] = &cpu::ld_r8_n<r8::D>;
+    instruction_table[LD_E_N] = &cpu::ld_r8_n<r8::E>;
+    instruction_table[LD_H_N] = &cpu::ld_r8_n<r8::H>;
+    instruction_table[LD_L_N] = &cpu::ld_r8_n<r8::L>;
     instruction_table[LD_A_NN] = &cpu::ld_a_nn;
 
     instruction_table[LD_A_N] = &cpu::ld_r8_nn<r8::A>;
@@ -429,6 +435,13 @@ uint32_t gb::cpu::ld_r8_r8(memory_map&)
     return 1;
 }
 
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::ld_r8_n(memory_map& mem)
+{
+    get_r8<reg>() = mem.read(PC.full++);
+    return 2;
+}
+
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
 {
     const uint16_t addr = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
@@ -441,12 +454,6 @@ uint32_t gb::cpu::ld_hld_a(memory_map& mem)
 {
     mem.write(HL.full, AF.high);
     HL.full--;
-    return 2;
-}
-
-uint32_t gb::cpu::ld_a_n(memory_map& mem)
-{
-    AF.high = mem.read(PC.full++);
     return 2;
 }
 
