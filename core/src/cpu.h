@@ -186,6 +186,7 @@ struct gb::cpu
     uint32_t ld_a_hld_mem(memory_map& mem);
     // same as ldi_a_hl
     uint32_t ld_a_hli_mem(memory_map& mem);
+    uint32_t ld_nn_sp(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jp_nz_nn(memory_map& mem);
     uint32_t jp_z_nn(memory_map& mem);

@@ -184,6 +184,8 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_A_HLD] = &cpu::ld_a_hld_mem;
     instruction_table[LD_A_HLI] = &cpu::ld_a_hli_mem;
 
+    instruction_table[LD_NN_SP] = &cpu::ld_nn_sp;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
@@ -579,6 +581,15 @@ uint32_t gb::cpu::ld_a_hli_mem(memory_map& mem)
 {
     AF.high = mem.read(HL.full++);
     return 2;
+}
+
+uint32_t gb::cpu::ld_nn_sp(memory_map& mem)
+{
+    const uint16_t addr = mem.read(PC.full) | mem.read(PC.full + 1) << 8;
+    PC.full += 2;
+    mem.write(addr, SP.full & 0xFF); // low byte of SP
+    mem.write(addr + 1, SP.full >> 8); // high byte of SP
+    return 5;
 }
 
 uint32_t gb::cpu::jp_nn(memory_map& mem)
