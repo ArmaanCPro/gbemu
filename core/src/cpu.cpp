@@ -167,6 +167,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_H_HL] = &cpu::ld_r8_hl_mem<r8::H>;
     instruction_table[LD_L_HL] = &cpu::ld_r8_hl_mem<r8::L>;
 
+    instruction_table[LD_BC_A] = &cpu::ld_r16_mem_a<r16::BC>;
+    instruction_table[LD_DE_A] = &cpu::ld_r16_mem_a<r16::DE>;
+    instruction_table[LD_HL_A] = &cpu::ld_r16_mem_a<r16::HL>;
+
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
     instruction_table[JP_Z_NN] = &cpu::jp_z_nn;
@@ -479,6 +483,13 @@ uint32_t gb::cpu::ld_r8_hl_mem(memory_map& mem)
 {
     get_r8<reg>() = mem.read(HL.full);
     return 2;
+}
+
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::ld_r16_mem_a(memory_map& mem)
+{
+    AF.high = mem.read(get_r16<reg>().full);
+    return 3;
 }
 
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
