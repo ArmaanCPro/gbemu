@@ -46,7 +46,7 @@ void APIENTRY glDebugOutput(GLenum source, GLenum, unsigned int id, GLenum sever
         default:
             outputstream << "Source: Unknown";
     }
-    std::cout << outputstream.str() << std::endl;
+    std::cerr << outputstream.str() << std::endl;
 }
 
 window::window(int scr_width, int scr_height, std::string title)
