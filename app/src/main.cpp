@@ -10,8 +10,6 @@
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 144
 #define SCREEN_MULTIPLIER 3
-#define WINDOW_WIDTH (SCREEN_WIDTH * SCREEN_MULTIPLIER)
-#define WINDOW_HEIGHT (SCREEN_HEIGHT * SCREEN_MULTIPLIER)
 
 int main(int argc, char* argv[])
 {
@@ -23,7 +21,7 @@ int main(int argc, char* argv[])
 
     fb_renderer renderer{};
 
-    bool skip_rom_execution = false;
+    //bool skip_rom_execution = false;
 
     if (argc == 2 && std::filesystem::exists(argv[1]))
     {
@@ -36,13 +34,13 @@ int main(int argc, char* argv[])
     }
     else
     {
-        skip_rom_execution = true;
+        //skip_rom_execution = true;
         std::cout << "Skipping rom loading" << std::endl;
     }
 
     while (!win.should_close())
     {
-        if (!skip_rom_execution)
+        //if (!skip_rom_execution)
         {
             try
             {

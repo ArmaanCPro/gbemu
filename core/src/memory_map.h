@@ -267,6 +267,12 @@ private:
         size_t num_ram_banks = 0;
         switch (ram_size)
         {
+            case 0x00:
+                num_ram_banks = 0;
+                break; // No RAM
+            case 0x01:
+                num_ram_banks = 1;
+                break; // 2KB
             case 0x02:
                 num_ram_banks = 1;
                 break; // 8KB
@@ -280,7 +286,7 @@ private:
                 num_ram_banks = 8;
                 break; // 64KB
             default:
-                std::cerr << "Unsupported RAM size: " << ram_size << std::endl;
+                std::cerr << "Unsupported RAM size: 0x" << std::hex << (int)ram_size << std::endl;
         }
 
         if (num_ram_banks > 0)
