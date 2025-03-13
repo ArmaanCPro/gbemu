@@ -82,9 +82,10 @@ void gb::cpu::init_instruction_table()
     instruction_table[CP_N] = &cpu::cp_a_n;
     instruction_table[CPL] = &cpu::cpl;
 
-    instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_BC_NN] = &cpu::ld_r16_nn<r16::BC>;
+    instruction_table[LD_DE_NN] = &cpu::ld_r16_nn<r16::DE>;
     instruction_table[LD_HL_NN] = &cpu::ld_r16_nn<r16::HL>;
+    instruction_table[LD_SP_NN] = &cpu::ld_r16_nn<r16::SP>;
     instruction_table[LD_NN_A] = &cpu::ld_nn_a;
     instruction_table[LD_HLD_A] = &cpu::ld_hld_a;
     instruction_table[LD_A_N] = &cpu::ld_r8_n<r8::A>;
@@ -147,6 +148,16 @@ void gb::cpu::init_instruction_table()
     instruction_table[LD_L_E] = &cpu::ld_r8_r8<r8::L, r8::E>;
     instruction_table[LD_L_H] = &cpu::ld_r8_r8<r8::L, r8::H>;
     instruction_table[LD_L_L] = &cpu::ld_r8_r8<r8::L, r8::L>;
+
+    instruction_table[LD_HL_A] = &cpu::ld_hl_mem_r8<r8::A>;
+    instruction_table[LD_HL_B] = &cpu::ld_hl_mem_r8<r8::B>;
+    instruction_table[LD_HL_C] = &cpu::ld_hl_mem_r8<r8::C>;
+    instruction_table[LD_HL_D] = &cpu::ld_hl_mem_r8<r8::D>;
+    instruction_table[LD_HL_E] = &cpu::ld_hl_mem_r8<r8::E>;
+    instruction_table[LD_HL_H] = &cpu::ld_hl_mem_r8<r8::H>;
+    instruction_table[LD_HL_L] = &cpu::ld_hl_mem_r8<r8::L>;
+
+    instruction_table[LD_HL_N] = &cpu::ld_hl_mem_n;
 
     instruction_table[JP_NN] = &cpu::jp_nn;
     instruction_table[JP_NZ_NN] = &cpu::jp_nz_nn;
@@ -440,6 +451,19 @@ uint32_t gb::cpu::ld_r8_n(memory_map& mem)
 {
     get_r8<reg>() = mem.read(PC.full++);
     return 2;
+}
+
+template <gb::cpu::r8 reg>
+uint32_t gb::cpu::ld_hl_mem_r8(memory_map& mem)
+{
+    mem.write(HL.full, get_r8<reg>());
+    return 2;
+}
+
+uint32_t gb::cpu::ld_hl_mem_n(memory_map& mem)
+{
+    mem.write(HL.full, mem.read(PC.full++));
+    return 3;
 }
 
 uint32_t gb::cpu::ld_nn_a(memory_map& mem)
