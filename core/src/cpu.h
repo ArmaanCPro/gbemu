@@ -174,6 +174,8 @@ struct gb::cpu
     // corresponds to ldh a8 a
     uint32_t ldh_nn_a(memory_map& mem);
     uint32_t ldh_c_a(memory_map& mem);
+    template <r16 reg>
+    uint32_t ld_a_r16_mem(memory_map& mem);
     uint32_t ld_a_nn(memory_map& mem);
     uint32_t jp_nn(memory_map& mem);
     uint32_t jp_nz_nn(memory_map& mem);
