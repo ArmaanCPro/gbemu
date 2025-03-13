@@ -207,8 +207,14 @@ void gb::cpu::init_instruction_table()
     instruction_table[CALL_C_NN] = &cpu::call_c_nn;
     instruction_table[CCF] = &cpu::ccf;
     instruction_table[RET] = &cpu::ret;
-    instruction_table[PUSH_BC] = &cpu::push_bc;
-    instruction_table[POP_BC] = &cpu::pop_bc;
+    instruction_table[PUSH_AF] = &cpu::push_af;
+    instruction_table[PUSH_BC] = &cpu::push_r16<r16::BC>;
+    instruction_table[PUSH_DE] = &cpu::push_r16<r16::DE>;
+    instruction_table[PUSH_HL] = &cpu::push_r16<r16::HL>;
+    instruction_table[POP_AF] = &cpu::pop_af;
+    instruction_table[POP_BC] = &cpu::pop_r8<r16::BC>;
+    instruction_table[POP_DE] = &cpu::pop_r8<r16::DE>;
+    instruction_table[POP_HL] = &cpu::pop_r8<r16::HL>;
 
     instruction_table[INC_A] = &cpu::inc_r8<r8::A>;
     instruction_table[INC_B] = &cpu::inc_r8<r8::B>;
@@ -848,20 +854,43 @@ uint32_t gb::cpu::ret(memory_map& mem)
     return 4;
 }
 
-uint32_t gb::cpu::push_bc(memory_map& mem)
+uint32_t gb::cpu::push_af(memory_map& mem)
 {
     SP.full--;
-    mem.write(SP.full, BC.high);
+    mem.write(SP.full, AF.high);
     SP.full--;
-    mem.write(SP.full, BC.low);
+    mem.write(SP.full, AF.low);
     return 4;
 }
 
-uint32_t gb::cpu::pop_bc(memory_map& mem)
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::push_r16(memory_map& mem)
 {
-    BC.low = mem.read(SP.full);
+    const Register16& r = get_r16<reg>();
+    SP.full--;
+    mem.write(SP.full, r.high);
+    SP.full--;
+    mem.write(SP.full, r.low);
+    return 4;
+}
+
+
+uint32_t gb::cpu::pop_af(memory_map& mem)
+{
+    AF.low = mem.read(SP.full);
     SP.full++;
-    BC.high = mem.read(SP.full);
+    AF.high = mem.read(SP.full);
+    SP.full++;
+    return 3;
+}
+
+template <gb::cpu::r16 reg>
+uint32_t gb::cpu::pop_r8(memory_map& mem)
+{
+    Register16& r = get_r16<reg>();
+    r.low = mem.read(SP.full);
+    SP.full++;
+    r.high = mem.read(SP.full);
     SP.full++;
     return 3;
 }

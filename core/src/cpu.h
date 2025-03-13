@@ -203,8 +203,12 @@ struct gb::cpu
     uint32_t jr_nc_n(memory_map& mem);
     uint32_t jr_c_n(memory_map& mem);
     uint32_t ret(memory_map& mem);
-    uint32_t push_bc(memory_map& mem);
-    uint32_t pop_bc(memory_map& mem);
+    uint32_t push_af(memory_map& mem);
+    template <r16 reg>
+    uint32_t push_r16(memory_map& mem);
+    uint32_t pop_af(memory_map& mem);
+    template <r16 reg>
+    uint32_t pop_r8(memory_map& mem);
     template <r8 reg>
     uint32_t inc_r8(memory_map&);
     uint32_t inc_hl_mem(memory_map& mem);
