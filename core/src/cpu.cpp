@@ -488,7 +488,7 @@ uint32_t gb::cpu::ld_r8_hl_mem(memory_map& mem)
 template <gb::cpu::r16 reg>
 uint32_t gb::cpu::ld_r16_mem_a(memory_map& mem)
 {
-    AF.high = mem.read(get_r16<reg>().full);
+    mem.write(get_r16<reg>().full, AF.high);
     return 3;
 }
 
