@@ -1,8 +1,17 @@
 Language: Cpp
 
 BasedOnStyle: Microsoft
+IndentWidth: 4
+NamespaceIndentation: All
+FixNamespaceComments: false
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeBraces: Allman
 BraceWrapping:
+  AfterCaseLabel: true
   AfterClass: true
   AfterControlStatement: true
   AfterEnum: true
@@ -11,15 +20,18 @@ BraceWrapping:
   AfterStruct: true
   AfterUnion: true
   AfterExternBlock: true
+  BeforeCatch: true
   BeforeElse: true
+  BeforeLambdaBody: false
+  BeforeWhile: false
   IndentBraces: true
-
-IndentWidth: 4
-NamespaceIndentation: All
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakConstructorInitializers: AfterColon
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IndentCaseLabels: false
 IndentCaseBlocks: true
-IndentCaseLabels: true
-
-PointerAlignment: Left
-ReferenceAlignment: Left
-
-SpaceBeforeCpp11BracedList: true
+SpaceAfterTemplateKeyword: true
+SpaceBeforeRangeBasedForLoopColon: true
+SpacesInParentheses: true
